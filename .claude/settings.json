@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm init *)",
+      "Bash(mkdir -p \"/Users/aaroonieleem/Desktop/Homework file/Idemia Project/poc/BackEnd/routes\" \"/Users/aaroonieleem/Desktop/Homework file/Idemia Project/poc/BackEnd/controllers\")"
+    ],
+    "additionalDirectories": [
+      "/Users/aaroonieleem/Desktop/Homework file/Idemia Project/poc/BackEnd/routes"
+    ]
+  }
+}

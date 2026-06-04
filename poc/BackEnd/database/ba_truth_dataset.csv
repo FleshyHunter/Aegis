@@ -1,0 +1,21 @@
+release,result_code,exception_label,action,reason,category,display_id,remarks
+SR4,RC1001,AUTH_FAIL,User logs in,Invalid password,Authentication,TC-001,Standard login failure case
+SR4,RC1002,PWD_RESET,User requests password reset,Email not registered,Password,TC-002,Edge: unregistered email
+SR4,RC1003,PWD_RESET,User requests password reset,Valid email sends link,Password,TC-003,Happy path reset
+SR5,RC1004,SESSION_TIMEOUT,User inactive,Session expired after 15 min,Session,TC-004,Timeout handling
+SR5,RC1005,AUTH_LOCK,5 failed logins,Account locked,Authentication,TC-005,Security lockout
+SR5,RC1006,DATA_SYNC,Sync triggered,API delay,Integration,TC-006,Backend latency case
+SR6,RC1007,PERMISSION_DENIED,Access admin page,Role mismatch,Authorization,TC-007,RBAC enforcement
+SR6,RC1008,DATA_VALIDATION,Submit form,Missing required fields,Validation,TC-008,Form validation rules
+SR6,RC1009,DATA_VALIDATION,Submit form,Invalid format email,Validation,TC-009,Email format check
+SR6,RC1010,API_ERROR,Fetch user data,500 internal error,Backend,TC-010,Server failure simulation
+SR7,RC1011,SESSION_TIMEOUT,Idle user,Auto logout,Session,TC-011,Auto logout behaviour
+SR7,RC1012,AUTH_FAIL,Login attempt,2FA required,Authentication,TC-012,Two factor auth flow
+SR7,RC1013,PWD_RESET,Reset password,SMS sent instead of email,Password,TC-013,Possible outdated spec
+SR7,RC1014,DATA_SYNC,Sync batch,Partial sync failure,Integration,TC-014,Intermittent failure
+SR8,RC1015,AUTH_FAIL,Login via SSO,SAML mismatch,Authentication,TC-015,Enterprise login
+SR8,RC1016,UI_RENDER,Load dashboard,Component missing,Frontend,TC-016,UI regression
+SR8,RC1017,PERMISSION_DENIED,Edit record,Read-only role,Authorization,TC-017,Role restriction
+SR8,RC1018,DATA_VALIDATION,Submit payment,Card declined,Payments,TC-018,Payment failure
+SR9,RC1019,API_ERROR,Call billing API,Timeout,Backend,TC-019,External API latency
+SR9,RC1020,SESSION_TIMEOUT,User inactive,Forced logout after upgrade,Session,TC-020,Release behaviour change

@@ -1,0 +1,14 @@
+{
+  "name": "idemia-poc",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "all": "concurrently \"npm run dev --prefix BackEnd\" \"npm run dev --prefix FrontEnd\"",
+    "server": "npm run dev --prefix BackEnd",
+    "dev": "npm run dev --prefix FrontEnd",
+    "install:all": "npm install --prefix BackEnd && npm install --prefix FrontEnd"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.3"
+  }
+}

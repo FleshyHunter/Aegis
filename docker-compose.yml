@@ -1,0 +1,55 @@
+services:
+
+  mongo:
+    image: mongo:7
+    container_name: idemia-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: idemia
+
+  api:
+    build:
+      context: ./poc/BackEnd
+      dockerfile: Dockerfile.node
+    container_name: idemia-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      MONGO_URI: mongodb://mongo:27017/idemia
+      NODE_ENV: production
+    depends_on:
+      - mongo
+
+  poc-runner:
+    build:
+      context: ./poc/BackEnd
+      dockerfile: Dockerfile.python
+    container_name: idemia-poc-runner
+    environment:
+      USE_MOCK_LLM: "true"
+      LLM_BASE_URL: ${LLM_BASE_URL:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-}
+    depends_on:
+      - mongo
+    volumes:
+      - ./poc/BackEnd/data:/app/poc/BackEnd/data
+
+  frontend:
+    build:
+      context: ./poc/FrontEnd
+      dockerfile: Dockerfile
+    container_name: idemia-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+
+volumes:
+  mongo-data:

@@ -1,0 +1,161 @@
+jira_ticket_id,test_case_id,step_id,action,expectation,source_result_code,category,release,label_hint
+JIRA-1000,TC-001,ST-1001,User logs in,Expected: Invalid password,RC1001,Authentication,SR4,match
+JIRA-1001,TC-001,ST-1002,User logs in (modified step),Expected: Invalid password,RC1001,Authentication,SR4,mismatch
+JIRA-1002,TC-001,ST-1003,User logs in,Expected: Invalid password BUT system behaves differently,RC1001,Authentication,SR4,mismatch
+JIRA-1003,TC-001,ST-1004,User logs in,Expected: Invalid password,RC1001,Authentication,SR4,match
+JIRA-1004,TC-001,ST-1005,User logs in,Expected: Invalid password,RC1001,Authentication,SR4,match
+JIRA-1005,TC-001,ST-1006,User logs in (modified step),Expected: Invalid password,RC1001,Authentication,SR4,mismatch
+JIRA-1006,TC-001,ST-1007,User logs in (modified step),Expected: Invalid password,RC1001,Authentication,SR4,mismatch
+JIRA-1007,TC-001,ST-1008,User logs in,Expected: Invalid password,RC1001,Authentication,SR4,match
+JIRA-1008,TC-002,ST-1009,User requests password reset (modified step),Expected: Email not registered,RC1002,Password,SR4,mismatch
+JIRA-1009,TC-002,ST-1010,User requests password reset,Expected: Email not registered,RC1002,Password,SR4,match
+JIRA-1010,TC-002,ST-1011,User requests password reset,Expected: Email not registered,RC1002,Password,SR4,match
+JIRA-1011,TC-002,ST-1012,User requests password reset,Expected: Email not registered BUT system behaves differently,RC1002,Password,SR4,mismatch
+JIRA-1012,TC-002,ST-1013,User requests password reset,Expected: Email not registered,RC1002,Password,SR4,match
+JIRA-1013,TC-002,ST-1014,User requests password reset,Expected: Email not registered BUT system behaves differently,RC1002,Password,SR4,mismatch
+JIRA-1014,TC-002,ST-1015,User requests password reset,Expected: Email not registered,RC1002,Password,SR4,match
+JIRA-1015,TC-002,ST-1016,User requests password reset (modified step),Expected: Email not registered,RC1002,Password,SR4,mismatch
+JIRA-1016,TC-003,ST-1017,User requests password reset,Expected: Valid email sends link,RC1003,Password,SR4,match
+JIRA-1017,TC-003,ST-1018,User requests password reset (modified step),Expected: Valid email sends link,RC1003,Password,SR4,mismatch
+JIRA-1018,TC-003,ST-1019,User requests password reset,Expected: Valid email sends link BUT system behaves differently,RC1003,Password,SR4,mismatch
+JIRA-1019,TC-003,ST-1020,User requests password reset,Expected: Valid email sends link,RC1003,Password,SR4,match
+JIRA-1020,TC-003,ST-1021,User requests password reset,Expected: Valid email sends link,RC1003,Password,SR4,match
+JIRA-1021,TC-003,ST-1022,User requests password reset,Expected: Valid email sends link,RC1003,Password,SR4,match
+JIRA-1022,TC-003,ST-1023,User requests password reset,Expected: Valid email sends link,RC1003,Password,SR4,match
+JIRA-1023,TC-003,ST-1024,User requests password reset,Expected: Valid email sends link,RC1003,Password,SR4,match
+JIRA-1024,TC-004,ST-1025,User inactive,Expected: Session expired after 15 min,RC1004,Session,SR5,match
+JIRA-1025,TC-004,ST-1026,User inactive,Expected: Session expired after 15 min,RC1004,Session,SR5,match
+JIRA-1026,TC-004,ST-1027,User inactive,Expected: Session expired after 15 min,RC1004,Session,SR5,match
+JIRA-1027,TC-004,ST-1028,User inactive,Expected: Session expired after 15 min,RC1004,Session,SR5,match
+JIRA-1028,TC-004,ST-1029,User inactive,Expected: Session expired after 15 min,RC1004,Session,SR5,match
+JIRA-1029,TC-004,ST-1030,User inactive,Expected: Session expired after 15 min,RC1004,Session,SR5,match
+JIRA-1030,TC-004,ST-1031,User inactive,Expected: Session expired after 15 min,RC1004,Session,SR5,match
+JIRA-1031,TC-004,ST-1032,User inactive (modified step),Expected: Session expired after 15 min,RC1004,Session,SR5,mismatch
+JIRA-1032,TC-005,ST-1033,5 failed logins (modified step),Expected: Account locked,RC1005,Authentication,SR5,mismatch
+JIRA-1033,TC-005,ST-1034,5 failed logins (modified step),Expected: Account locked,RC1005,Authentication,SR5,mismatch
+JIRA-1034,TC-005,ST-1035,5 failed logins,Expected: Account locked BUT system behaves differently,RC1005,Authentication,SR5,mismatch
+JIRA-1035,TC-005,ST-1036,5 failed logins,Expected: Account locked,RC1005,Authentication,SR5,match
+JIRA-1036,TC-005,ST-1037,5 failed logins,Expected: Account locked,RC1005,Authentication,SR5,match
+JIRA-1037,TC-005,ST-1038,5 failed logins (modified step),Expected: Account locked,RC1005,Authentication,SR5,mismatch
+JIRA-1038,TC-005,ST-1039,5 failed logins,Expected: Account locked,RC1005,Authentication,SR5,match
+JIRA-1039,TC-005,ST-1040,5 failed logins,Expected: Account locked,RC1005,Authentication,SR5,match
+JIRA-1040,TC-006,ST-1041,Sync triggered,Expected: API delay,RC1006,Integration,SR5,match
+JIRA-1041,TC-006,ST-1042,Sync triggered,Expected: API delay BUT system behaves differently,RC1006,Integration,SR5,mismatch
+JIRA-1042,TC-006,ST-1043,Sync triggered (modified step),Expected: API delay,RC1006,Integration,SR5,mismatch
+JIRA-1043,TC-006,ST-1044,Sync triggered,Expected: API delay,RC1006,Integration,SR5,match
+JIRA-1044,TC-006,ST-1045,Sync triggered,Expected: API delay,RC1006,Integration,SR5,match
+JIRA-1045,TC-006,ST-1046,Sync triggered,Expected: API delay,RC1006,Integration,SR5,match
+JIRA-1046,TC-006,ST-1047,Sync triggered,Expected: API delay,RC1006,Integration,SR5,match
+JIRA-1047,TC-006,ST-1048,Sync triggered,Expected: API delay,RC1006,Integration,SR5,match
+JIRA-1048,TC-007,ST-1049,Access admin page,Expected: Role mismatch,RC1007,Authorization,SR6,match
+JIRA-1049,TC-007,ST-1050,Access admin page (modified step),Expected: Role mismatch,RC1007,Authorization,SR6,mismatch
+JIRA-1050,TC-007,ST-1051,Access admin page (modified step),Expected: Role mismatch,RC1007,Authorization,SR6,mismatch
+JIRA-1051,TC-007,ST-1052,Access admin page,Expected: Role mismatch BUT system behaves differently,RC1007,Authorization,SR6,mismatch
+JIRA-1052,TC-007,ST-1053,Access admin page,Expected: Role mismatch,RC1007,Authorization,SR6,match
+JIRA-1053,TC-007,ST-1054,Access admin page,Expected: Role mismatch BUT system behaves differently,RC1007,Authorization,SR6,mismatch
+JIRA-1054,TC-007,ST-1055,Access admin page,Expected: Role mismatch,RC1007,Authorization,SR6,match
+JIRA-1055,TC-007,ST-1056,Access admin page,Expected: Role mismatch,RC1007,Authorization,SR6,match
+JIRA-1056,TC-008,ST-1057,Submit form,Expected: Missing required fields,RC1008,Validation,SR6,match
+JIRA-1057,TC-008,ST-1058,Submit form (modified step),Expected: Missing required fields,RC1008,Validation,SR6,mismatch
+JIRA-1058,TC-008,ST-1059,Submit form,Expected: Missing required fields,RC1008,Validation,SR6,match
+JIRA-1059,TC-008,ST-1060,Submit form,Expected: Missing required fields BUT system behaves differently,RC1008,Validation,SR6,mismatch
+JIRA-1060,TC-008,ST-1061,Submit form,Expected: Missing required fields,RC1008,Validation,SR6,match
+JIRA-1061,TC-008,ST-1062,Submit form,Expected: Missing required fields,RC1008,Validation,SR6,match
+JIRA-1062,TC-008,ST-1063,Submit form,Expected: Missing required fields BUT system behaves differently,RC1008,Validation,SR6,mismatch
+JIRA-1063,TC-008,ST-1064,Submit form,Expected: Missing required fields,RC1008,Validation,SR6,match
+JIRA-1064,TC-009,ST-1065,Submit form (modified step),Expected: Invalid format email,RC1009,Validation,SR6,mismatch
+JIRA-1065,TC-009,ST-1066,Submit form,Expected: Invalid format email BUT system behaves differently,RC1009,Validation,SR6,mismatch
+JIRA-1066,TC-009,ST-1067,Submit form,Expected: Invalid format email,RC1009,Validation,SR6,match
+JIRA-1067,TC-009,ST-1068,Submit form,Expected: Invalid format email,RC1009,Validation,SR6,match
+JIRA-1068,TC-009,ST-1069,Submit form (modified step),Expected: Invalid format email,RC1009,Validation,SR6,mismatch
+JIRA-1069,TC-009,ST-1070,Submit form,Expected: Invalid format email,RC1009,Validation,SR6,match
+JIRA-1070,TC-009,ST-1071,Submit form,Expected: Invalid format email,RC1009,Validation,SR6,match
+JIRA-1071,TC-009,ST-1072,Submit form,Expected: Invalid format email,RC1009,Validation,SR6,match
+JIRA-1072,TC-010,ST-1073,Fetch user data,Expected: 500 internal error,RC1010,Backend,SR6,match
+JIRA-1073,TC-010,ST-1074,Fetch user data,Expected: 500 internal error BUT system behaves differently,RC1010,Backend,SR6,mismatch
+JIRA-1074,TC-010,ST-1075,Fetch user data,Expected: 500 internal error,RC1010,Backend,SR6,match
+JIRA-1075,TC-010,ST-1076,Fetch user data,Expected: 500 internal error,RC1010,Backend,SR6,match
+JIRA-1076,TC-010,ST-1077,Fetch user data,Expected: 500 internal error BUT system behaves differently,RC1010,Backend,SR6,mismatch
+JIRA-1077,TC-010,ST-1078,Fetch user data (modified step),Expected: 500 internal error,RC1010,Backend,SR6,mismatch
+JIRA-1078,TC-010,ST-1079,Fetch user data,Expected: 500 internal error,RC1010,Backend,SR6,match
+JIRA-1079,TC-010,ST-1080,Fetch user data,Expected: 500 internal error,RC1010,Backend,SR6,match
+JIRA-1080,TC-011,ST-1081,Idle user,Expected: Auto logout,RC1011,Session,SR7,match
+JIRA-1081,TC-011,ST-1082,Idle user,Expected: Auto logout BUT system behaves differently,RC1011,Session,SR7,mismatch
+JIRA-1082,TC-011,ST-1083,Idle user,Expected: Auto logout BUT system behaves differently,RC1011,Session,SR7,mismatch
+JIRA-1083,TC-011,ST-1084,Idle user,Expected: Auto logout,RC1011,Session,SR7,match
+JIRA-1084,TC-011,ST-1085,Idle user,Expected: Auto logout BUT system behaves differently,RC1011,Session,SR7,mismatch
+JIRA-1085,TC-011,ST-1086,Idle user,Expected: Auto logout,RC1011,Session,SR7,match
+JIRA-1086,TC-011,ST-1087,Idle user,Expected: Auto logout BUT system behaves differently,RC1011,Session,SR7,mismatch
+JIRA-1087,TC-011,ST-1088,Idle user,Expected: Auto logout,RC1011,Session,SR7,match
+JIRA-1088,TC-012,ST-1089,Login attempt,Expected: 2FA required,RC1012,Authentication,SR7,match
+JIRA-1089,TC-012,ST-1090,Login attempt,Expected: 2FA required,RC1012,Authentication,SR7,match
+JIRA-1090,TC-012,ST-1091,Login attempt (modified step),Expected: 2FA required,RC1012,Authentication,SR7,mismatch
+JIRA-1091,TC-012,ST-1092,Login attempt,Expected: 2FA required BUT system behaves differently,RC1012,Authentication,SR7,mismatch
+JIRA-1092,TC-012,ST-1093,Login attempt,Expected: 2FA required,RC1012,Authentication,SR7,match
+JIRA-1093,TC-012,ST-1094,Login attempt,Expected: 2FA required,RC1012,Authentication,SR7,match
+JIRA-1094,TC-012,ST-1095,Login attempt (modified step),Expected: 2FA required,RC1012,Authentication,SR7,mismatch
+JIRA-1095,TC-012,ST-1096,Login attempt,Expected: 2FA required,RC1012,Authentication,SR7,match
+JIRA-1096,TC-013,ST-1097,Reset password,Expected: SMS sent instead of email,RC1013,Password,SR7,match
+JIRA-1097,TC-013,ST-1098,Reset password (modified step),Expected: SMS sent instead of email,RC1013,Password,SR7,mismatch
+JIRA-1098,TC-013,ST-1099,Reset password,Expected: SMS sent instead of email BUT system behaves differently,RC1013,Password,SR7,mismatch
+JIRA-1099,TC-013,ST-1100,Reset password,Expected: SMS sent instead of email,RC1013,Password,SR7,match
+JIRA-1100,TC-013,ST-1101,Reset password (modified step),Expected: SMS sent instead of email,RC1013,Password,SR7,mismatch
+JIRA-1101,TC-013,ST-1102,Reset password,Expected: SMS sent instead of email,RC1013,Password,SR7,match
+JIRA-1102,TC-013,ST-1103,Reset password,Expected: SMS sent instead of email BUT system behaves differently,RC1013,Password,SR7,mismatch
+JIRA-1103,TC-013,ST-1104,Reset password,Expected: SMS sent instead of email,RC1013,Password,SR7,match
+JIRA-1104,TC-014,ST-1105,Sync batch,Expected: Partial sync failure BUT system behaves differently,RC1014,Integration,SR7,mismatch
+JIRA-1105,TC-014,ST-1106,Sync batch,Expected: Partial sync failure,RC1014,Integration,SR7,match
+JIRA-1106,TC-014,ST-1107,Sync batch (modified step),Expected: Partial sync failure,RC1014,Integration,SR7,mismatch
+JIRA-1107,TC-014,ST-1108,Sync batch,Expected: Partial sync failure,RC1014,Integration,SR7,match
+JIRA-1108,TC-014,ST-1109,Sync batch,Expected: Partial sync failure,RC1014,Integration,SR7,match
+JIRA-1109,TC-014,ST-1110,Sync batch,Expected: Partial sync failure,RC1014,Integration,SR7,match
+JIRA-1110,TC-014,ST-1111,Sync batch,Expected: Partial sync failure,RC1014,Integration,SR7,match
+JIRA-1111,TC-014,ST-1112,Sync batch (modified step),Expected: Partial sync failure,RC1014,Integration,SR7,mismatch
+JIRA-1112,TC-015,ST-1113,Login via SSO,Expected: SAML mismatch BUT system behaves differently,RC1015,Authentication,SR8,mismatch
+JIRA-1113,TC-015,ST-1114,Login via SSO (modified step),Expected: SAML mismatch,RC1015,Authentication,SR8,mismatch
+JIRA-1114,TC-015,ST-1115,Login via SSO,Expected: SAML mismatch BUT system behaves differently,RC1015,Authentication,SR8,mismatch
+JIRA-1115,TC-015,ST-1116,Login via SSO,Expected: SAML mismatch BUT system behaves differently,RC1015,Authentication,SR8,mismatch
+JIRA-1116,TC-015,ST-1117,Login via SSO,Expected: SAML mismatch,RC1015,Authentication,SR8,match
+JIRA-1117,TC-015,ST-1118,Login via SSO (modified step),Expected: SAML mismatch,RC1015,Authentication,SR8,mismatch
+JIRA-1118,TC-015,ST-1119,Login via SSO,Expected: SAML mismatch,RC1015,Authentication,SR8,match
+JIRA-1119,TC-015,ST-1120,Login via SSO (modified step),Expected: SAML mismatch,RC1015,Authentication,SR8,mismatch
+JIRA-1120,TC-016,ST-1121,Load dashboard,Expected: Component missing,RC1016,Frontend,SR8,match
+JIRA-1121,TC-016,ST-1122,Load dashboard,Expected: Component missing,RC1016,Frontend,SR8,match
+JIRA-1122,TC-016,ST-1123,Load dashboard,Expected: Component missing,RC1016,Frontend,SR8,match
+JIRA-1123,TC-016,ST-1124,Load dashboard,Expected: Component missing,RC1016,Frontend,SR8,match
+JIRA-1124,TC-016,ST-1125,Load dashboard,Expected: Component missing,RC1016,Frontend,SR8,match
+JIRA-1125,TC-016,ST-1126,Load dashboard (modified step),Expected: Component missing,RC1016,Frontend,SR8,mismatch
+JIRA-1126,TC-016,ST-1127,Load dashboard,Expected: Component missing,RC1016,Frontend,SR8,match
+JIRA-1127,TC-016,ST-1128,Load dashboard,Expected: Component missing,RC1016,Frontend,SR8,match
+JIRA-1128,TC-017,ST-1129,Edit record,Expected: Read-only role,RC1017,Authorization,SR8,match
+JIRA-1129,TC-017,ST-1130,Edit record,Expected: Read-only role,RC1017,Authorization,SR8,match
+JIRA-1130,TC-017,ST-1131,Edit record,Expected: Read-only role,RC1017,Authorization,SR8,match
+JIRA-1131,TC-017,ST-1132,Edit record,Expected: Read-only role,RC1017,Authorization,SR8,match
+JIRA-1132,TC-017,ST-1133,Edit record (modified step),Expected: Read-only role,RC1017,Authorization,SR8,mismatch
+JIRA-1133,TC-017,ST-1134,Edit record,Expected: Read-only role BUT system behaves differently,RC1017,Authorization,SR8,mismatch
+JIRA-1134,TC-017,ST-1135,Edit record (modified step),Expected: Read-only role,RC1017,Authorization,SR8,mismatch
+JIRA-1135,TC-017,ST-1136,Edit record,Expected: Read-only role,RC1017,Authorization,SR8,match
+JIRA-1136,TC-018,ST-1137,Submit payment,Expected: Card declined,RC1018,Payments,SR8,match
+JIRA-1137,TC-018,ST-1138,Submit payment (modified step),Expected: Card declined,RC1018,Payments,SR8,mismatch
+JIRA-1138,TC-018,ST-1139,Submit payment,Expected: Card declined,RC1018,Payments,SR8,match
+JIRA-1139,TC-018,ST-1140,Submit payment,Expected: Card declined,RC1018,Payments,SR8,match
+JIRA-1140,TC-018,ST-1141,Submit payment,Expected: Card declined,RC1018,Payments,SR8,match
+JIRA-1141,TC-018,ST-1142,Submit payment,Expected: Card declined,RC1018,Payments,SR8,match
+JIRA-1142,TC-018,ST-1143,Submit payment,Expected: Card declined BUT system behaves differently,RC1018,Payments,SR8,mismatch
+JIRA-1143,TC-018,ST-1144,Submit payment,Expected: Card declined,RC1018,Payments,SR8,match
+JIRA-1144,TC-019,ST-1145,Call billing API,Expected: Timeout,RC1019,Backend,SR9,match
+JIRA-1145,TC-019,ST-1146,Call billing API,Expected: Timeout,RC1019,Backend,SR9,match
+JIRA-1146,TC-019,ST-1147,Call billing API,Expected: Timeout,RC1019,Backend,SR9,match
+JIRA-1147,TC-019,ST-1148,Call billing API (modified step),Expected: Timeout,RC1019,Backend,SR9,mismatch
+JIRA-1148,TC-019,ST-1149,Call billing API (modified step),Expected: Timeout,RC1019,Backend,SR9,mismatch
+JIRA-1149,TC-019,ST-1150,Call billing API (modified step),Expected: Timeout,RC1019,Backend,SR9,mismatch
+JIRA-1150,TC-019,ST-1151,Call billing API,Expected: Timeout,RC1019,Backend,SR9,match
+JIRA-1151,TC-019,ST-1152,Call billing API,Expected: Timeout BUT system behaves differently,RC1019,Backend,SR9,mismatch
+JIRA-1152,TC-020,ST-1153,User inactive,Expected: Forced logout after upgrade,RC1020,Session,SR9,match
+JIRA-1153,TC-020,ST-1154,User inactive,Expected: Forced logout after upgrade,RC1020,Session,SR9,match
+JIRA-1154,TC-020,ST-1155,User inactive,Expected: Forced logout after upgrade,RC1020,Session,SR9,match
+JIRA-1155,TC-020,ST-1156,User inactive,Expected: Forced logout after upgrade,RC1020,Session,SR9,match
+JIRA-1156,TC-020,ST-1157,User inactive,Expected: Forced logout after upgrade,RC1020,Session,SR9,match
+JIRA-1157,TC-020,ST-1158,User inactive,Expected: Forced logout after upgrade,RC1020,Session,SR9,match
+JIRA-1158,TC-020,ST-1159,User inactive (modified step),Expected: Forced logout after upgrade,RC1020,Session,SR9,mismatch
+JIRA-1159,TC-020,ST-1160,User inactive,Expected: Forced logout after upgrade,RC1020,Session,SR9,match
