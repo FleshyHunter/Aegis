@@ -1,36 +1,24 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface IBuildingBlock extends Document {
-  block_id: string;
   name: string;
-  category: string;
-  action: string;
-  expected_result: string;
-  source_result_codes: string[];
-  tags: string[];
-  notes: string;
+  columns: string[];
+  rows: Record<string, string>[];
+  row_count: number;
   created_at: Date;
-  updated_at: Date;
 }
 
 const BuildingBlockSchema = new Schema<IBuildingBlock>(
   {
-    block_id:            { type: String, required: true, unique: true, index: true },
-    name:                { type: String, required: true },
-    category:            { type: String, default: "", index: true },
-    action:              { type: String, default: "" },
-    expected_result:     { type: String, default: "" },
-    source_result_codes: { type: [String], default: [], index: true },
-    tags:                { type: [String], default: [] },
-    notes:               { type: String, default: "" },
+    name:      { type: String, required: true },
+    columns:   { type: [String], default: [] },
+    rows:      { type: Schema.Types.Mixed, default: [] },
+    row_count: { type: Number, default: 0 },
   },
   {
     collection: "BuildingBlocks",
-    timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+    timestamps: { createdAt: "created_at", updatedAt: false },
   }
 );
 
-export const BuildingBlock = mongoose.model<IBuildingBlock>(
-  "BuildingBlock",
-  BuildingBlockSchema
-);
+export const BuildingBlock = mongoose.model<IBuildingBlock>("BuildingBlock", BuildingBlockSchema);
