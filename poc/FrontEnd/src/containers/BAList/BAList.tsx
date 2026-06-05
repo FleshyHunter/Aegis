@@ -121,6 +121,7 @@ export default function BAList() {
     entry.name.toLowerCase().includes(search.toLowerCase())
   );
 
+
   return (
     <div>
       <Navbar />
@@ -161,21 +162,21 @@ export default function BAList() {
           <table className="ba-table ba-list-table">
             <thead>
               <tr>
-                <th>Date Added</th>
                 <th>Name</th>
+                <th>Date Added</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {filteredEntries.map((entry) => (
                 <tr key={entry.id}>
-                  <td>{new Date(entry.created_at).toLocaleString()}</td>
                   <td
                     className="ba-name-link"
                     onClick={() => navigate(`/ba/${entry.id}`, { state: entry })}
                   >
                     {entry.name}
                   </td>
+                  <td>{new Date(entry.created_at).toLocaleString()}</td>
                   <td>
                     <div className="ba-actions">
                       <button

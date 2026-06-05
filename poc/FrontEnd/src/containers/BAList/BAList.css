@@ -64,17 +64,18 @@
   background-color: var(--color-bg-secondary);
 }
 
-/* Date shrinks to content (list page only) */
+/* Name absorbs the remaining width, pushing Action to the right (list page only) */
 .ba-list-table th:nth-child(1),
 .ba-list-table td:nth-child(1) {
-  width: 1%;
-  white-space: nowrap;
+  width: 100%;
 }
 
-/* Name absorbs the remaining width, pushing Action to the right (list page only) */
+/* Date shrinks to content and aligns like the action column (list page only) */
 .ba-list-table th:nth-child(2),
 .ba-list-table td:nth-child(2) {
-  width: 100%;
+  width: 1%;
+  white-space: nowrap;
+  text-align: left;
 }
 
 /* Action column shrinks to its content; header + icons flushed left together (list page only) */
