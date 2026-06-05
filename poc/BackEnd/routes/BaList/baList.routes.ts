@@ -1,5 +1,11 @@
 import { Router } from "express";
-import { getAllBAListsController, getBAListByIdController, createBAListController, deleteBAListController, updateBAListNameController } from "../controllers/baList.controller";
+import {
+	getAllBAListsController,
+	getBAListByIdController,
+	createBAListController,
+	deleteBAListController,
+	updateBAListNameController,
+} from "../../controllers/BaList/baList.controller";
 
 const router = Router();
 

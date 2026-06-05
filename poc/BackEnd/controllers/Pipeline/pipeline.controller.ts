@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { runPipeline } from "../services/pipeline.service";
+import { runPipeline } from "../../services/Pipeline/pipeline.service";
 
 export async function runPipelineController(req: Request, res: Response): Promise<void> {
   const { baData, jiraData } = req.body;

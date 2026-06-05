@@ -1,5 +1,11 @@
 import { Request, Response } from "express";
-import { getAllBALists, getBAListById, createBAList, deleteBAList, updateBAListName } from "../services/baList.service";
+import {
+  getAllBALists,
+  getBAListById,
+  createBAList,
+  deleteBAList,
+  updateBAListName,
+} from "../../services/BaList/baList.service";
 
 export async function getAllBAListsController(_req: Request, res: Response): Promise<void> {
   try {

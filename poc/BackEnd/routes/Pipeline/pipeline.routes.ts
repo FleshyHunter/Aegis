@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { runPipelineController } from "../controllers/pipeline.controller";
+import { runPipelineController } from "../../controllers/Pipeline/pipeline.controller";
 
 const router = Router();
 

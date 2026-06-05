@@ -1,4 +1,4 @@
-import { BAList } from "../models/BAList";
+import { BAList } from "../../models/BaList/BAList";
 
 export async function getAllBALists() {
   return BAList.find().sort({ created_at: -1 }).lean();

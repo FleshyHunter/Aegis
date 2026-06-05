@@ -1,8 +1,8 @@
 import express from "express";
 import cors from "cors";
 import { connectDB, getDBStatus } from "./database/database";
-import baListRoutes from "./routes/baList.routes";
-import pipelineRoutes from "./routes/pipeline.routes";
+import baListRoutes from "./routes/BaList/baList.routes";
+import pipelineRoutes from "./routes/Pipeline/pipeline.routes";
 
 const app = express();
 const PORT = process.env.PORT || 3000;

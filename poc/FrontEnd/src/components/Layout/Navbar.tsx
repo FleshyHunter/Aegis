@@ -9,7 +9,7 @@ export default function Navbar() {
         <Link to="/">Home</Link>
         <Link to="/ba">BA</Link>
         <Link to="/">Building Blocks</Link>
-        <Link to="/">Sets</Link>
+        <Link to="/">Ticket Sets</Link>
         <Link to="/tickets">Tickets</Link>
       </nav>
     </header>
