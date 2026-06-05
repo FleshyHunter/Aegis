@@ -29,6 +29,18 @@
   border-color: var(--color-accent-hover);
 }
 
+.btn-secondary {
+  background-color: transparent;
+  border-color: var(--color-link);
+  color: var(--color-link);
+}
+
+.btn-secondary:hover {
+  background-color: rgba(88, 166, 255, 0.1);
+  border-color: var(--color-link-hover);
+  color: var(--color-link-hover);
+}
+
 .btn-danger {
   background-color: var(--color-danger);
   border-color: var(--color-danger);
