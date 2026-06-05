@@ -1,3 +1,8 @@
+@keyframes metalShine {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
 @keyframes fadeSlideDown {
   from {
     opacity: 0;
@@ -21,10 +26,24 @@
   font-family: 'Zen Dots', sans-serif;
   font-size: 128px;
   font-weight: 700;
-  color: var(--color-heading);
   letter-spacing: -1px;
   margin-bottom: 16px;
-  animation: fadeSlideDown 4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  background: linear-gradient(
+    105deg,
+    #e6edf3 35%,
+    #58a6ff 46%,
+    #cce4ff 50%,
+    #58a6ff 54%,
+    #e6edf3 65%
+  );
+  background-size: 300% auto;
+  background-position: 200% center;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation:
+    fadeSlideDown 4s cubic-bezier(0.22, 1, 0.36, 1) both,
+    metalShine 15s 15s ease-in-out infinite;
 }
 
 .hero-subtitle {

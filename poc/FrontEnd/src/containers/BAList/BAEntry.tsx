@@ -67,6 +67,7 @@ export default function BAEntry() {
           </table>
         </div>
       )}
+      
     </div>
   );
 }
