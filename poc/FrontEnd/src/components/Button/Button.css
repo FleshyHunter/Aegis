@@ -28,3 +28,14 @@
   background-color: var(--color-accent-hover);
   border-color: var(--color-accent-hover);
 }
+
+.btn-danger {
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background-color: #da3633;
+  border-color: #da3633;
+}

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getAllBALists, getBAListById, createBAList, deleteBAList } from "../services/baList.service";
+import { getAllBALists, getBAListById, createBAList, deleteBAList, updateBAListName } from "../services/baList.service";
 
 export async function getAllBAListsController(_req: Request, res: Response): Promise<void> {
   try {
@@ -33,6 +33,25 @@ export async function getBAListByIdController(req: Request<{ id: string }>, res:
   } catch (err) {
     console.error("[baList]", err);
     res.status(500).json({ error: "Failed to fetch BA list." });
+  }
+}
+
+export async function updateBAListNameController(req: Request<{ id: string }>, res: Response): Promise<void> {
+  const { name } = req.body;
+  if (!name || typeof name !== "string" || !name.trim()) {
+    res.status(400).json({ error: "name is required." });
+    return;
+  }
+  try {
+    const updated = await updateBAListName(req.params.id, name.trim());
+    if (!updated) {
+      res.status(404).json({ error: "Not found." });
+      return;
+    }
+    res.json({ id: updated._id, name: updated.name, created_at: updated.created_at });
+  } catch (err) {
+    console.error("[baList]", err);
+    res.status(500).json({ error: "Failed to update BA list." });
   }
 }
 

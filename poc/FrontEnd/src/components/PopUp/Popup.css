@@ -1,0 +1,55 @@
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(1, 4, 9, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup-box {
+  width: 100%;
+  max-width: 400px;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(1, 4, 9, 0.5);
+}
+
+.popup-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-heading);
+  margin-bottom: 8px;
+}
+
+.popup-message {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.popup-input {
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+}
+
+.popup-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

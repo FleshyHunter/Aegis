@@ -1,7 +1,8 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BsEye, BsTrash } from "react-icons/bs";
+import { BsEye, BsPencil, BsTrash } from "react-icons/bs";
 import Navbar from "../../components/Layout/Navbar";
+import { usePopup } from "../../components/PopUp/PopupContext";
 import "./BAList.css";
 
 interface BAListEntry {
@@ -30,6 +31,7 @@ function parseCSV(text: string): Row[] {
 
 export default function BAList() {
   const navigate = useNavigate();
+  const { confirm, prompt } = usePopup();
   const [entries, setEntries] = useState<BAListEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
@@ -68,7 +70,13 @@ export default function BAList() {
   }
 
   async function handleDelete(id: string) {
-    if (!window.confirm("Delete this BA rule set?")) return;
+    const ok = await confirm({
+      title: "Delete BA rule set",
+      message: "Are you sure you want to delete this BA rule set? This cannot be undone.",
+      confirmText: "Delete",
+      variant: "danger",
+    });
+    if (!ok) return;
     try {
       const res = await fetch(`http://localhost:3000/api/ba-lists/${id}`, {
         method: "DELETE",
@@ -77,6 +85,35 @@ export default function BAList() {
       setEntries((prev) => prev.filter((entry) => entry.id !== id));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Delete failed.");
+    }
+  }
+
+  async function handleRename(entry: BAListEntry) {
+    const nextName = await prompt({
+      title: "Rename BA rule set",
+      message: "Enter a new name for this BA rule set.",
+      confirmText: "Save",
+      defaultValue: entry.name,
+      placeholder: "BA rule set name",
+    });
+
+    if (nextName === null) return;
+    const trimmed = nextName.trim();
+    if (!trimmed || trimmed === entry.name) return;
+
+    try {
+      const res = await fetch(`http://localhost:3000/api/ba-lists/${entry.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: trimmed }),
+      });
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      const updated = await res.json();
+      setEntries((prev) =>
+        prev.map((item) => (item.id === entry.id ? { ...item, name: updated.name } : item))
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Rename failed.");
     }
   }
 
@@ -147,6 +184,13 @@ export default function BAList() {
                         onClick={() => navigate(`/ba/${entry.id}`, { state: entry })}
                       >
                         <BsEye />
+                      </button>
+                      <button
+                        className="ba-icon-btn"
+                        title="Edit name"
+                        onClick={() => handleRename(entry)}
+                      >
+                        <BsPencil />
                       </button>
                       <button
                         className="ba-icon-btn ba-icon-danger"

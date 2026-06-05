@@ -13,6 +13,10 @@ export async function createBAList(name: string, rows: Record<string, string>[])
   return BAList.create({ name, columns, rows, row_count: rows.length });
 }
 
+export async function updateBAListName(id: string, name: string) {
+  return BAList.findByIdAndUpdate(id, { name }, { new: true }).lean();
+}
+
 export async function deleteBAList(id: string) {
   return BAList.findByIdAndDelete(id).lean();
 }
