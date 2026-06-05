@@ -1,4 +1,4 @@
-import { TicketSet } from "../../models/TicketSet";
+import { TicketSet } from "../../models/TicketSet/TicketSet";
 
 export async function getAllTicketSets() {
   return TicketSet.find().sort({ created_at: -1 }).lean();

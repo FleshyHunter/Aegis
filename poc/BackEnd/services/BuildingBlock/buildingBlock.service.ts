@@ -1,4 +1,4 @@
-import { BuildingBlock } from "../../models/BuildingBlock";
+import { BuildingBlock } from "../../models/BuildingBlock/BuildingBlock";
 
 export async function getAllBuildingBlocks() {
   return BuildingBlock.find().sort({ created_at: -1 }).lean();

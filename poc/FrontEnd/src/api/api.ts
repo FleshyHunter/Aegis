@@ -10,24 +10,56 @@ export async function runPipeline(baData: Record<string, string>[], jiraData: Re
   return res.json();
 }
 
+async function requestJson(path: string, options?: RequestInit) {
+  const res = await fetch(`${BASE_URL}${path}`, options);
+  if (!res.ok) throw new Error(`API error: ${res.status}`);
+  return res.json();
+}
+
 export async function importBAList(fileName: string, rows: Record<string, string>[]) {
-  const res = await fetch(`${BASE_URL}/api/ba-lists`, {
+  return requestJson("/api/ba-lists", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ fileName, rows }),
   });
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
-  return res.json();
 }
 
 export async function fetchBALists() {
-  const res = await fetch(`${BASE_URL}/api/ba-lists`);
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
-  return res.json();
+  return requestJson("/api/ba-lists");
 }
 
 export async function fetchBAListById(id: string) {
-  const res = await fetch(`${BASE_URL}/api/ba-lists/${id}`);
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
-  return res.json();
+  return requestJson(`/api/ba-lists/${id}`);
+}
+
+export async function fetchBuildingBlocks() {
+  return requestJson("/api/building-blocks");
+}
+
+export async function fetchBuildingBlockById(id: string) {
+  return requestJson(`/api/building-blocks/${id}`);
+}
+
+export async function createBuildingBlock(name: string, rows: Record<string, string>[]) {
+  return requestJson("/api/building-blocks", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, rows }),
+  });
+}
+
+export async function fetchTicketSets() {
+  return requestJson("/api/ticket-sets");
+}
+
+export async function fetchTicketSetById(id: string) {
+  return requestJson(`/api/ticket-sets/${id}`);
+}
+
+export async function createTicketSet(name: string, rows: Record<string, string>[]) {
+  return requestJson("/api/ticket-sets", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, rows }),
+  });
 }

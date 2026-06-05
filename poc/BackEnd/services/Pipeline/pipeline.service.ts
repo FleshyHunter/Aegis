@@ -7,7 +7,7 @@ interface Row {
   [key: string]: string;
 }
 
-interface PipelineResult {
+interface PipelineResult extends Record<string, string> {
   jira_ticket_id: string;
   test_case_id: string;
   step_id: string;
@@ -56,7 +56,8 @@ export async function runPipeline(
   fs.writeFileSync(baPath, toCSV(baData), "utf-8");
   fs.writeFileSync(jiraPath, toCSV(jiraData), "utf-8");
 
-  const scriptPath = path.resolve(__dirname, "../pipeline/run_poc.py");
+  const pipelineDir = path.resolve(__dirname, "../../pipeline");
+  const scriptPath = path.join(pipelineDir, "run_poc.py");
 
   await new Promise<void>((resolve, reject) => {
     const proc = spawn("python3", [scriptPath], {
@@ -67,7 +68,7 @@ export async function runPipeline(
         OUTPUT_PATH: outputPath,
         USE_MOCK_LLM: "true",
       },
-      cwd: path.resolve(__dirname, "../pipeline"),
+      cwd: pipelineDir,
     });
 
     proc.stderr.on("data", (data) => console.error("[pipeline]", data.toString()));

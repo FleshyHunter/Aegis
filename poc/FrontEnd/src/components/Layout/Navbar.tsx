@@ -8,8 +8,8 @@ export default function Navbar() {
       <nav className="navbar-links">
         <Link to="/">Home</Link>
         <Link to="/ba">BA</Link>
-        <Link to="/">Building Blocks</Link>
-        <Link to="/">Ticket Sets</Link>
+        <Link to="/building-blocks">Building Blocks</Link>
+        <Link to="/ticket-sets">Ticket Sets</Link>
         <Link to="/tickets">Tickets</Link>
       </nav>
     </header>

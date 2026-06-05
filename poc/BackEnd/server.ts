@@ -2,7 +2,9 @@ import express from "express";
 import cors from "cors";
 import { connectDB, getDBStatus } from "./database/database";
 import baListRoutes from "./routes/BaList/baList.routes";
+import buildingBlockRoutes from "./routes/BuildingBlock/buildingBlock.routes";
 import pipelineRoutes from "./routes/Pipeline/pipeline.routes";
+import ticketSetRoutes from "./routes/TicketSet/ticketSet.routes";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,6 +22,8 @@ app.get("/health", (_req, res) => {
 
 app.use("/api", pipelineRoutes);
 app.use("/api", baListRoutes);
+app.use("/api", buildingBlockRoutes);
+app.use("/api", ticketSetRoutes);
 
 async function start(): Promise<void> {
   await connectDB();

@@ -1,11 +1,11 @@
-export { BAList } from "./BAList";
-export type { IBAList } from "./BAList";
+export { BAList } from "./BaList/BAList";
+export type { IBAList } from "./BaList/BAList";
 
-export { BuildingBlock } from "./BuildingBlock";
-export type { IBuildingBlock } from "./BuildingBlock";
+export { BuildingBlock } from "./BuildingBlock/BuildingBlock";
+export type { IBuildingBlock } from "./BuildingBlock/BuildingBlock";
 
-export { TestCase } from "./TestCase";
-export type { ITestCase } from "./TestCase";
+export { TestCase } from "./TestCase/TestCase";
+export type { ITestCase } from "./TestCase/TestCase";
 
-export { TicketSet } from "./TicketSet";
-export type { ITicketSet, ITicketSetItem } from "./TicketSet";
+export { TicketSet } from "./TicketSet/TicketSet";
+export type { ITicketSet, ITicketSetItem } from "./TicketSet/TicketSet";
