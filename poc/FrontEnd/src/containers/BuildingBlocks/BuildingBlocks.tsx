@@ -4,6 +4,8 @@ import { BsEye, BsPencil, BsTrash } from "react-icons/bs";
 import Navbar from "../../components/Layout/Navbar";
 import { usePopup } from "../../components/PopUp/PopupContext";
 import type { EntrySummary } from "../../components/EntryView/EntrySummary.ts";
+import { usePagination } from "../../components/Pagination/usePagination";
+import Pagination from "../../components/Pagination/Pagination";
 import "./BuildingBlocks.css";
 
 interface Row {
@@ -116,6 +118,8 @@ export default function BuildingBlocks() {
     entry.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  const pagination = usePagination(filteredEntries, 20);
+
   return (
     <div>
       <Navbar />
@@ -162,7 +166,7 @@ export default function BuildingBlocks() {
               </tr>
             </thead>
             <tbody>
-              {filteredEntries.map((entry) => (
+              {pagination.pageItems.map((entry) => (
                 <tr key={entry.id}>
                   <td
                     className="bb-name-link"
@@ -200,6 +204,15 @@ export default function BuildingBlocks() {
               ))}
             </tbody>
           </table>
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            startIndex={pagination.startIndex}
+            perPage={pagination.perPage}
+            totalItems={pagination.totalItems}
+            onPrev={() => pagination.setPage((p) => p - 1)}
+            onNext={() => pagination.setPage((p) => p + 1)}
+          />
         </div>
       )}
     </div>

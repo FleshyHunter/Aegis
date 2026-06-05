@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { BsEye, BsPencil, BsTrash } from "react-icons/bs";
 import Navbar from "../../components/Layout/Navbar";
 import { usePopup } from "../../components/PopUp/PopupContext";
+import { usePagination } from "../../components/Pagination/usePagination";
+import Pagination from "../../components/Pagination/Pagination";
 import "./BAList.css";
 
 interface BAListEntry {
@@ -121,6 +123,7 @@ export default function BAList() {
     entry.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  const pagination = usePagination(filteredEntries, 20);
 
   return (
     <div>
@@ -168,7 +171,7 @@ export default function BAList() {
               </tr>
             </thead>
             <tbody>
-              {filteredEntries.map((entry) => (
+              {pagination.pageItems.map((entry) => (
                 <tr key={entry.id}>
                   <td
                     className="ba-name-link"
@@ -206,6 +209,15 @@ export default function BAList() {
               ))}
             </tbody>
           </table>
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            startIndex={pagination.startIndex}
+            perPage={pagination.perPage}
+            totalItems={pagination.totalItems}
+            onPrev={() => pagination.setPage((p) => p - 1)}
+            onNext={() => pagination.setPage((p) => p + 1)}
+          />
         </div>
       )}
     </div>

@@ -1,10 +1,14 @@
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-export async function runPipeline(baData: Record<string, string>[], jiraData: Record<string, string>[]) {
+export async function runPipeline(
+  baData: Record<string, string>[],
+  jiraData: Record<string, string>[],
+  ticketSetName?: string,
+) {
   const res = await fetch(`${BASE_URL}/api/run`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ baData, jiraData }),
+    body: JSON.stringify({ baData, jiraData, ticketSetName }),
   });
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   return res.json();
@@ -16,11 +20,11 @@ async function requestJson(path: string, options?: RequestInit) {
   return res.json();
 }
 
-export async function importBAList(fileName: string, rows: Record<string, string>[]) {
+export async function importBAList(name: string, rows: Record<string, string>[]) {
   return requestJson("/api/ba-lists", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ fileName, rows }),
+    body: JSON.stringify({ name, rows }),
   });
 }
 

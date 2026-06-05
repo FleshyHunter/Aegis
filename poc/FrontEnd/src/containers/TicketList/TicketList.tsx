@@ -3,7 +3,10 @@ import "./TicketList.css";
 import Navbar from "../../components/Layout/Navbar";
 import Button from "../../components/Button/Button";
 import Toolbar from "../../components/ToolBar/Toolbar";
-import { runPipeline } from "../../api/api";
+import CsvSelectModal from "../../components/CsvSelectModal/CsvSelectModal";
+import { usePagination } from "../../components/Pagination/usePagination";
+import Pagination from "../../components/Pagination/Pagination";
+import { runPipeline, importBAList, createBuildingBlock } from "../../api/api";
 
 interface Column {
   key: string;
@@ -52,17 +55,26 @@ function readFile(file: File): Promise<Row[]> {
   });
 }
 
+type ModalTarget = "ba" | "bb" | null;
+
 export default function TicketList() {
   const [rows, setRows] = useState<Row[]>([]);
   const [filter, setFilter] = useState<string>("All");
   const [jiraFileName, setJiraFileName] = useState<string | null>(null);
-  const [baFileName, setBaFileName] = useState<string | null>(null);
+
+  const [baName, setBaName] = useState<string | null>(null);
   const [baData, setBaData] = useState<Row[]>([]);
+  const [baIsNew, setBaIsNew] = useState(false);
+
+  const [bbName, setBbName] = useState<string | null>(null);
+  const [bbData, setBbData] = useState<Row[]>([]);
+  const [bbIsNew, setBbIsNew] = useState(false);
+
+  const [activeModal, setActiveModal] = useState<ModalTarget>(null);
   const [running, setRunning] = useState<boolean>(false);
   const [runError, setRunError] = useState<string | null>(null);
 
   const jiraFileRef = useRef<HTMLInputElement>(null);
-  const baFileRef = useRef<HTMLInputElement>(null);
 
   async function handleJiraUpload(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -72,19 +84,35 @@ export default function TicketList() {
     setRows(parsed);
   }
 
-  async function handleBaUpload(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setBaFileName(file.name);
-    const parsed = await readFile(file);
-    setBaData(parsed);
+  function handleBaSelect(name: string, selectedRows: Row[], isNew: boolean) {
+    setBaName(name);
+    setBaData(selectedRows);
+    setBaIsNew(isNew);
+    setActiveModal(null);
+  }
+
+  function handleBbSelect(name: string, selectedRows: Row[], isNew: boolean) {
+    setBbName(name);
+    setBbData(selectedRows);
+    setBbIsNew(isNew);
+    setActiveModal(null);
   }
 
   async function handleRun() {
+    if (!jiraFileName) return;
     setRunning(true);
     setRunError(null);
     try {
-      const data = await runPipeline(baData, rows);
+      if (baIsNew && baName && baData.length) {
+        await importBAList(baName, baData);
+        setBaIsNew(false);
+      }
+      if (bbIsNew && bbName && bbData.length) {
+        await createBuildingBlock(bbName, bbData);
+        setBbIsNew(false);
+      }
+      const ticketSetName = `${jiraFileName} (Checked)`;
+      const data = await runPipeline(bbData, rows, ticketSetName);
       setRows(data.results);
       setFilter("All");
     } catch (err) {
@@ -98,6 +126,8 @@ export default function TicketList() {
     filter === "All"
       ? rows
       : rows.filter((row) => (row["classification"] || "").toUpperCase() === filter);
+
+  const pagination = usePagination(filteredRows, 20);
 
   return (
     <div>
@@ -118,24 +148,52 @@ export default function TicketList() {
         }
         right={
           <>
-            <input ref={baFileRef} type="file" accept=".csv" style={{ display: "none" }} onChange={handleBaUpload} />
-            <Button label="Building Blocks" onClick={() => baFileRef.current?.click()} />
-            {baFileName && <span className="file-name">{baFileName}</span>}
+            <Button label="BA" onClick={() => setActiveModal("ba")} />
+            {baName && <span className="file-name">{baName}</span>}
 
-            <input ref={jiraFileRef} type="file" accept=".csv" style={{ display: "none" }} onChange={handleJiraUpload} />
+            <Button label="Building Blocks" onClick={() => setActiveModal("bb")} />
+            {bbName && <span className="file-name">{bbName}</span>}
+
+            <input
+              ref={jiraFileRef}
+              type="file"
+              accept=".csv"
+              style={{ display: "none" }}
+              onChange={handleJiraUpload}
+            />
             <Button label="Import" onClick={() => jiraFileRef.current?.click()} />
             {jiraFileName && <span className="file-name">{jiraFileName}</span>}
 
             <Button
               label={running ? "Running..." : "Run"}
               variant="primary"
-              disabled={!baData.length || !rows.length || running}
+              disabled={!bbData.length || !rows.length || running}
               onClick={handleRun}
             />
             {runError && <span className="table-error">{runError}</span>}
           </>
         }
       />
+
+      {activeModal === "ba" && (
+        <CsvSelectModal
+          title="Select BA Rules"
+          fetchUrl="http://localhost:3000/api/ba-lists"
+          detailUrl="http://localhost:3000/api/ba-lists"
+          onSelect={handleBaSelect}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
+
+      {activeModal === "bb" && (
+        <CsvSelectModal
+          title="Select Building Blocks"
+          fetchUrl="http://localhost:3000/api/building-blocks"
+          detailUrl="http://localhost:3000/api/building-blocks"
+          onSelect={handleBbSelect}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
 
       {!rows.length ? (
         <p className="table-status">Import a Jira test step CSV to view data.</p>
@@ -150,8 +208,8 @@ export default function TicketList() {
               </tr>
             </thead>
             <tbody>
-              {filteredRows.map((row, i) => (
-                <tr key={i}>
+              {pagination.pageItems.map((row, i) => (
+                <tr key={pagination.startIndex + i}>
                   {COLUMNS.map((col) => (
                     <td key={col.key}>{row[col.key] || "—"}</td>
                   ))}
@@ -159,6 +217,15 @@ export default function TicketList() {
               ))}
             </tbody>
           </table>
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            startIndex={pagination.startIndex}
+            perPage={pagination.perPage}
+            totalItems={pagination.totalItems}
+            onPrev={() => pagination.setPage((p) => p - 1)}
+            onNext={() => pagination.setPage((p) => p + 1)}
+          />
         </div>
       )}
     </div>
