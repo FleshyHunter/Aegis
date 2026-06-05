@@ -1,0 +1,157 @@
+.ba-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ba-toolbar-left,
+.ba-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ba-search {
+  min-width: 260px;
+  padding: 6px 12px;
+  font-size: 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+}
+
+.ba-search::placeholder {
+  color: var(--color-text-muted);
+}
+
+.ba-table-wrapper {
+  overflow-x: auto;
+  padding: 24px 32px;
+}
+
+.ba-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.ba-table thead {
+  background-color: var(--color-bg-secondary);
+  position: sticky;
+  top: 0;
+}
+
+.ba-table th {
+  text-align: left;
+  padding: 10px 14px;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.ba-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  vertical-align: top;
+}
+
+.ba-table tbody tr:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+/* Date shrinks to content (list page only) */
+.ba-list-table th:nth-child(1),
+.ba-list-table td:nth-child(1) {
+  width: 1%;
+  white-space: nowrap;
+}
+
+/* Name absorbs the remaining width, pushing Action to the right (list page only) */
+.ba-list-table th:nth-child(2),
+.ba-list-table td:nth-child(2) {
+  width: 100%;
+}
+
+/* Action column shrinks to its content; header + icons flushed left together (list page only) */
+.ba-list-table th:nth-child(3),
+.ba-list-table td:nth-child(3) {
+  width: 1%;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.ba-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+.ba-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  font-size: 15px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.ba-icon-btn:hover {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.ba-icon-danger:hover {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.ba-table-status {
+  padding: 32px;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.ba-name-link {
+  color: var(--color-link);
+  cursor: pointer;
+}
+
+.ba-name-link:hover {
+  text-decoration: underline;
+  color: var(--color-link-hover);
+}
+
+.ba-entry-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 32px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ba-entry-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.ba-entry-info {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-left: 8px;
+}
+
+.ba-error {
+  color: var(--color-danger);
+  padding: 12px 32px;
+  font-size: 13px;
+}

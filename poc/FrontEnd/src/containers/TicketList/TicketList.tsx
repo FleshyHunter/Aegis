@@ -1,6 +1,8 @@
 import React, { useState, useRef, ChangeEvent } from "react";
 import "./TicketList.css";
 import Navbar from "../../components/Layout/Navbar";
+import Button from "../../components/Button/Button";
+import Toolbar from "../../components/ToolBar/Toolbar";
 import { runPipeline } from "../../api/api";
 
 interface Column {
@@ -26,7 +28,7 @@ const COLUMNS: Column[] = [
   { key: "label_hint",          label: "Label Hint" },
 ];
 
-const FILTERS = ["All", "MATCH", "PARTIAL MATCH", "MISMATCH"];
+const FILTERS = ["All", "MATCH", "MISMATCH"];
 
 function parseCSV(text: string): Row[] {
   const [headerLine, ...lines] = text.trim().split("\n");
@@ -101,42 +103,39 @@ export default function TicketList() {
     <div>
       <Navbar />
 
-      <div className="toolbar">
-        <div className="filter-group">
-          {FILTERS.map((f) => (
-            <button
-              key={f}
-              className={`btn ${filter === f ? "btn-primary" : ""}`}
-              onClick={() => setFilter(f)}
-            >
-              {f}
-            </button>
-          ))}
-        </div>
+      <Toolbar
+        left={
+          <>
+            {FILTERS.map((f) => (
+              <Button
+                key={f}
+                label={f}
+                variant={filter === f ? "primary" : "default"}
+                onClick={() => setFilter(f)}
+              />
+            ))}
+          </>
+        }
+        right={
+          <>
+            <input ref={baFileRef} type="file" accept=".csv" style={{ display: "none" }} onChange={handleBaUpload} />
+            <Button label="Building Blocks" onClick={() => baFileRef.current?.click()} />
+            {baFileName && <span className="file-name">{baFileName}</span>}
 
-        <div className="action-group">
-          <input ref={baFileRef} type="file" accept=".csv" style={{ display: "none" }} onChange={handleBaUpload} />
-          <button className="btn" onClick={() => baFileRef.current?.click()}>
-            Building Blocks
-          </button>
-          {baFileName && <span className="file-name">{baFileName}</span>}
+            <input ref={jiraFileRef} type="file" accept=".csv" style={{ display: "none" }} onChange={handleJiraUpload} />
+            <Button label="Import" onClick={() => jiraFileRef.current?.click()} />
+            {jiraFileName && <span className="file-name">{jiraFileName}</span>}
 
-          <input ref={jiraFileRef} type="file" accept=".csv" style={{ display: "none" }} onChange={handleJiraUpload} />
-          <button className="btn" onClick={() => jiraFileRef.current?.click()}>
-            Import
-          </button>
-          {jiraFileName && <span className="file-name">{jiraFileName}</span>}
-
-          <button
-            className="btn btn-primary"
-            disabled={!baData.length || !rows.length || running}
-            onClick={handleRun}
-          >
-            {running ? "Running..." : "Run"}
-          </button>
-          {runError && <span className="table-error">{runError}</span>}
-        </div>
-      </div>
+            <Button
+              label={running ? "Running..." : "Run"}
+              variant="primary"
+              disabled={!baData.length || !rows.length || running}
+              onClick={handleRun}
+            />
+            {runError && <span className="table-error">{runError}</span>}
+          </>
+        }
+      />
 
       {!rows.length ? (
         <p className="table-status">Import a Jira test step CSV to view data.</p>

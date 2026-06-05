@@ -29,7 +29,7 @@ BA_TRUTH_PATH = Path(os.getenv("BA_TRUTH_PATH", str(DATA_DIR / "ba_truth_dataset
 JIRA_STEPS_PATH = Path(os.getenv("JIRA_STEPS_PATH", str(DATA_DIR / "jira_teststep_dataset.csv")))
 OUTPUT_PATH = Path(os.getenv("OUTPUT_PATH", str(PROJECT_DIR.parent / "database" / "poc_results.csv")))
 
-VALID_CLASSIFICATIONS = {"MATCH", "PARTIAL MATCH", "MISMATCH"}
+VALID_CLASSIFICATIONS = {"MATCH", "MISMATCH"}
 
 
 def main() -> None:

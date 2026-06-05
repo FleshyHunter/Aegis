@@ -7,6 +7,9 @@ export default function Navbar() {
       <h1 className="navbar-logo">Idemia</h1>
       <nav className="navbar-links">
         <Link to="/">Home</Link>
+        <Link to="/ba">BA</Link>
+        <Link to="/">Building Blocks</Link>
+        <Link to="/">Sets</Link>
         <Link to="/tickets">Tickets</Link>
       </nav>
     </header>

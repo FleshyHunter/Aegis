@@ -1,25 +1,28 @@
 import express from "express";
 import cors from "cors";
-import { connectDB } from "./database/database";
+import { connectDB, getDBStatus } from "./database/database";
+import baListRoutes from "./routes/baList.routes";
 import pipelineRoutes from "./routes/pipeline.routes";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 
 // health check
 app.get("/health", (_req, res) => {
-  res.json({ status: "ok" });
+  res.json({
+    status: "ok",
+    database: getDBStatus(),
+  });
 });
 
 app.use("/api", pipelineRoutes);
+app.use("/api", baListRoutes);
 
 async function start(): Promise<void> {
-  if (process.env.MONGO_URI) {
-    await connectDB();
-  }
+  await connectDB();
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });

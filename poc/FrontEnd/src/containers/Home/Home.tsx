@@ -1,6 +1,6 @@
 import React from "react";
 import Navbar from "../../components/Layout/Navbar";
-import Button from "../../components/Button";
+import Button from "../../components/Button/Button";
 import Footer from "../../components/Layout/Footer";
 
 export default function Home() {
