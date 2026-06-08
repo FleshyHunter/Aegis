@@ -1,3 +1,4 @@
+import { loadEnv } from "./config/env";
 import express from "express";
 import cors from "cors";
 import { connectDB, getDBStatus } from "./database/database";
@@ -7,6 +8,7 @@ import pipelineRoutes from "./routes/Pipeline/pipeline.routes";
 import ticketSetRoutes from "./routes/TicketSet/ticketSet.routes";
 
 const app = express();
+loadEnv();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());

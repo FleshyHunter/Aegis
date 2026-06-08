@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
+import { loadEnv } from "../config/env";
 import { BAList, BuildingBlock, TicketSet } from "../models";
 
+loadEnv();
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/idemia";
 
 export function getDBStatus(): string {

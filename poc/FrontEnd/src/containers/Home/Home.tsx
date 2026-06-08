@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Layout/Navbar";
 import Button from "../../components/Button/Button";
 import Footer from "../../components/Layout/Footer";
+import FeatureCard from "../../components/Description/FeatureCard";
 import "./Home.css";
 
 const SUBTITLE = "Clean tickets, zero friction. Aegis uses advanced AI to guard your workflow, instantly flagging ticket anomalies and keeping your pipeline spotless.";
@@ -50,6 +51,25 @@ export default function Home() {
           <Button label="BA Rules" variant="secondary" onClick={() => navigate("/ba")} />
           <Button label="Building Blocks" variant="secondary" onClick={() => navigate("/building-blocks")} />
           <Button label="Ticket Sets" variant="secondary" onClick={() => navigate("/ticket-sets")} />
+        </div>
+
+        <div className="home-feature-cards">
+          <FeatureCard
+            title="BA Rules"
+            description="Import and manage BA rule sets. Each entry is a CSV that defines the source-of-truth actions and reasons used to validate Jira test steps."
+          />
+          <FeatureCard
+            title="Building Blocks"
+            description="Upload and organise building block sets. These define the reusable test components that feed into the validation pipeline."
+          />
+          <FeatureCard
+            title="Ticket Sets"
+            description="View the output of each pipeline run. Results are saved here automatically after Run completes, showing MATCH and MISMATCH classifications."
+          />
+          <FeatureCard
+            title="Tickets"
+            description="Import Jira test step CSVs, select your BA and Building Block inputs, and run the AI pipeline to flag ticket anomalies."
+          />
         </div>
       </main>
 
