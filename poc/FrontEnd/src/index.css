@@ -131,7 +131,27 @@ pre {
 
 .navbar-links {
   display: flex;
-  gap: 24px;
+  gap: 4px;
+}
+
+.navbar-pill {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  color: var(--color-link);
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.navbar-pill:hover {
+  background-color: rgba(59, 130, 246, 0.12);
+  color: var(--color-link);
+}
+
+.navbar-pill.active {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: var(--color-link);
+  font-weight: 500;
 }
 
 /* Hero */
