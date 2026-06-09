@@ -44,11 +44,13 @@ export async function fetchBuildingBlockById(id: string) {
   return requestJson(`/api/building-blocks/${id}`);
 }
 
-export async function createBuildingBlock(name: string, rows: Record<string, string>[]) {
+export async function uploadBuildingBlock(file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+
   return requestJson("/api/building-blocks", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, rows }),
+    body: formData,
   });
 }
 

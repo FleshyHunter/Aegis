@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { BsTrash, BsCheckCircleFill, BsFileEarmarkText } from "react-icons/bs";
 import "./CsvSelectModal.css";
 
 interface Row {
@@ -15,7 +16,9 @@ interface Props {
   title: string;
   fetchUrl: string;
   detailUrl: string;
+  selectedName?: string | null;
   onSelect: (name: string, rows: Row[], isNew: boolean) => void;
+  onClearSelected?: () => void;
   onClose: () => void;
 }
 
@@ -33,7 +36,15 @@ function parseCSV(text: string): Row[] {
     });
 }
 
-export default function CsvSelectModal({ title, fetchUrl, detailUrl, onSelect, onClose }: Props) {
+export default function CsvSelectModal({
+  title,
+  fetchUrl,
+  detailUrl,
+  selectedName,
+  onSelect,
+  onClearSelected,
+  onClose,
+}: Props) {
   const [entries, setEntries] = useState<EntrySummary[]>([]);
   const [loadingList, setLoadingList] = useState(true);
   const [loadingEntry, setLoadingEntry] = useState<string | null>(null);
@@ -124,14 +135,27 @@ export default function CsvSelectModal({ title, fetchUrl, detailUrl, onSelect, o
               >
                 <span className="csm-entry-name">{entry.name}</span>
                 <span className="csm-entry-date">
-                  {loadingEntry === entry.id
-                    ? "Loading..."
-                    : new Date(entry.created_at).toLocaleDateString()}
+                  {new Date(entry.created_at).toLocaleDateString()}
                 </span>
               </button>
             ))
           )}
         </div>
+
+        {selectedName && (
+          <div className="csm-selected">
+            <BsCheckCircleFill className="csm-selected-check" />
+            <BsFileEarmarkText className="csm-selected-file-icon" />
+            <span className="csm-selected-name">{selectedName}</span>
+            <button
+              className="csm-selected-delete"
+              title="Remove selected file"
+              onClick={onClearSelected}
+            >
+              <BsTrash />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

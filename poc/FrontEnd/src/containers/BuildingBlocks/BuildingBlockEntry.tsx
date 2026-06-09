@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../../components/Layout/Navbar";
-import { usePagination } from "../../components/Pagination/usePagination";
-import Pagination from "../../components/Pagination/Pagination";
 import "./BuildingBlocks.css";
 
 interface BuildingBlockDetail {
   id: string;
   name: string;
-  columns: string[];
-  rows: Record<string, string>[];
-  row_count: number;
+  file_name: string;
+  source_type: "docx";
+  mime_type: string;
+  size_bytes: number;
+  preview_text: string;
+  preview_status: "ready" | "unsupported" | "failed";
+  preview_error: string;
   created_at: string;
 }
 
@@ -29,13 +31,9 @@ export default function BuildingBlockEntry() {
       })
       .then((data) => {
         setEntry(data);
-        pagination.reset();
       })
       .catch((err) => setError(err.message));
   }, [id]);
-
-  const pagination = usePagination(entry?.rows ?? [], 20);
-  const { pageItems, startIndex } = pagination;
 
   return (
     <div>
@@ -47,7 +45,7 @@ export default function BuildingBlockEntry() {
           <>
             <span className="bb-entry-name">{entry.name}</span>
             <span className="bb-entry-info">
-              {entry.row_count} rows · {new Date(entry.created_at).toLocaleString()}
+              {entry.source_type.toUpperCase()} · {formatBytes(entry.size_bytes)} · {new Date(entry.created_at).toLocaleString()}
             </span>
           </>
         )}
@@ -56,36 +54,40 @@ export default function BuildingBlockEntry() {
       {error && <p className="bb-error">{error}</p>}
 
       {entry && (
-        <div className="bb-table-wrapper">
-          <table className="bb-table">
-            <thead>
-              <tr>
-                {entry.columns.map((col) => (
-                  <th key={col}>{col}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {pageItems.map((row, i) => (
-                <tr key={startIndex + i}>
-                  {entry.columns.map((col) => (
-                    <td key={col}>{row[col] || "—"}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <Pagination
-            currentPage={pagination.currentPage}
-            totalPages={pagination.totalPages}
-            startIndex={startIndex}
-            perPage={pagination.perPage}
-            totalItems={pagination.totalItems}
-            onPrev={() => pagination.setPage((p) => p - 1)}
-            onNext={() => pagination.setPage((p) => p + 1)}
-          />
+        <div className="bb-doc-view">
+          <dl className="bb-doc-metadata">
+            <div>
+              <dt>File name</dt>
+              <dd>{entry.file_name}</dd>
+            </div>
+            <div>
+              <dt>Document type</dt>
+              <dd>{entry.source_type.toUpperCase()}</dd>
+            </div>
+          </dl>
+          <div className="bb-doc-placeholder">
+            {entry.preview_status === "ready" ? (
+              <pre className="bb-doc-preview-text">{entry.preview_text}</pre>
+            ) : (
+              <span>{entry.preview_error || "Document preview is not available."}</span>
+            )}
+          </div>
         </div>
       )}
     </div>
   );
+}
+
+function formatBytes(bytes: number): string {
+  if (!bytes) return "0 B";
+  const units = ["B", "KB", "MB"];
+  let value = bytes;
+  let unitIndex = 0;
+
+  while (value >= 1024 && unitIndex < units.length - 1) {
+    value /= 1024;
+    unitIndex += 1;
+  }
+
+  return `${value.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
 }

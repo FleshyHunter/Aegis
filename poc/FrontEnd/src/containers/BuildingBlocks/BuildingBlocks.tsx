@@ -2,29 +2,12 @@ import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { BsEye, BsPencil, BsTrash } from "react-icons/bs";
 import Navbar from "../../components/Layout/Navbar";
+import { fetchBuildingBlocks, uploadBuildingBlock } from "../../api/api";
 import { usePopup } from "../../components/PopUp/PopupContext";
 import type { EntrySummary } from "../../components/EntryView/EntrySummary.ts";
 import { usePagination } from "../../components/Pagination/usePagination";
 import Pagination from "../../components/Pagination/Pagination";
 import "./BuildingBlocks.css";
-
-interface Row {
-  [key: string]: string;
-}
-
-function parseCSV(text: string): Row[] {
-  const [headerLine, ...lines] = text.trim().split("\n");
-  const headers = headerLine.split(",").map((h) => h.trim());
-  return lines
-    .filter((l) => l.trim())
-    .map((line) => {
-      const values = line.split(",");
-      return headers.reduce((row: Row, h, i) => {
-        row[h] = values[i]?.trim() ?? "";
-        return row;
-      }, {});
-    });
-}
 
 export default function BuildingBlocks() {
   const navigate = useNavigate();
@@ -36,8 +19,7 @@ export default function BuildingBlocks() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/building-blocks")
-      .then((r) => r.json())
+    fetchBuildingBlocks()
       .then(setEntries)
       .catch(() => setError("Failed to load building blocks."));
   }, []);
@@ -48,15 +30,7 @@ export default function BuildingBlocks() {
     setImporting(true);
     setError(null);
     try {
-      const text = await file.text();
-      const rows = parseCSV(text);
-      const res = await fetch("http://localhost:3000/api/building-blocks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: file.name, rows }),
-      });
-      if (!res.ok) throw new Error(`Server error ${res.status}`);
-      const saved = await res.json();
+      const saved = await uploadBuildingBlock(file);
       setEntries((prev) => [saved, ...prev]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Import failed.");
@@ -139,7 +113,7 @@ export default function BuildingBlocks() {
           <input
             ref={fileRef}
             type="file"
-            accept=".csv"
+            accept=".docx"
             style={{ display: "none" }}
             onChange={handleImport}
           />

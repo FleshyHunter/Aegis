@@ -1,12 +1,16 @@
-import React, { useState, useRef, ChangeEvent } from "react";
+import React, { useState } from "react";
 import "./TicketList.css";
 import Navbar from "../../components/Layout/Navbar";
 import Button from "../../components/Button/Button";
 import Toolbar from "../../components/ToolBar/Toolbar";
 import CsvSelectModal from "../../components/CsvSelectModal/CsvSelectModal";
+import BuildingBlockSelectModal, {
+  type BuildingBlockSelection,
+} from "../../components/BuildingBlockSelectModal/BuildingBlockSelectModal";
+import TicketUploadModal from "../../components/TicketUploadModal/TicketUploadModal";
 import { usePagination } from "../../components/Pagination/usePagination";
 import Pagination from "../../components/Pagination/Pagination";
-import { runPipeline, importBAList, createBuildingBlock } from "../../api/api";
+import { runPipeline, importBAList } from "../../api/api";
 
 interface Column {
   key: string;
@@ -20,18 +24,20 @@ interface Row {
 const COLUMNS: Column[] = [
   { key: "jira_ticket_id",      label: "Jira Ticket ID" },
   { key: "test_case_id",        label: "Test Case ID" },
-  { key: "step_id",             label: "Step ID" },
   { key: "source_result_code",  label: "Result Code" },
-  { key: "ba_action",           label: "BA Action" },
-  { key: "ba_reason",           label: "BA Reason" },
-  { key: "jira_action",         label: "Jira Action" },
-  { key: "jira_expectation",    label: "Jira Expectation" },
   { key: "classification",      label: "Classification" },
+  { key: "building_block",      label: "Building Block" },
   { key: "explanation",         label: "Explanation" },
   { key: "label_hint",          label: "Label Hint" },
 ];
 
-const FILTERS = ["All", "MATCH", "MISMATCH"];
+const FILTERS = ["All", "PASSED", "FAILED", "SKIPPED"];
+
+const TICKET_FIELD_ALIASES = {
+  jira_ticket_id: ["jira_ticket_id", "ticket_id", "jira_key", "issue_key", "key"],
+  test_case_id: ["test_case_id", "testcase_id", "test_id", "case_id"],
+  source_result_code: ["source_result_code", "result_code", "code"],
+};
 
 function parseCSV(text: string): Row[] {
   const [headerLine, ...lines] = text.trim().split("\n");
@@ -55,7 +61,7 @@ function readFile(file: File): Promise<Row[]> {
   });
 }
 
-type ModalTarget = "ba" | "bb" | null;
+type ModalTarget = "ba" | "bb" | "tickets" | null;
 
 export default function TicketList() {
   const [rows, setRows] = useState<Row[]>([]);
@@ -65,37 +71,34 @@ export default function TicketList() {
   const [baName, setBaName] = useState<string | null>(null);
   const [baData, setBaData] = useState<Row[]>([]);
   const [baIsNew, setBaIsNew] = useState(false);
-
-  const [bbName, setBbName] = useState<string | null>(null);
-  const [bbData, setBbData] = useState<Row[]>([]);
-  const [bbIsNew, setBbIsNew] = useState(false);
+  const [selectedBuildingBlocks, setSelectedBuildingBlocks] = useState<BuildingBlockSelection[]>([]);
 
   const [activeModal, setActiveModal] = useState<ModalTarget>(null);
   const [running, setRunning] = useState<boolean>(false);
   const [runError, setRunError] = useState<string | null>(null);
 
-  const jiraFileRef = useRef<HTMLInputElement>(null);
-
-  async function handleJiraUpload(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  async function handleJiraUpload(file: File) {
     setJiraFileName(file.name);
     const parsed = await readFile(file);
-    setRows(parsed);
+    setRows(parsed.map(normalizeTicketRow));
+  }
+
+  function handleClearJiraUpload() {
+    setJiraFileName(null);
+    setRows([]);
+    setFilter("All");
   }
 
   function handleBaSelect(name: string, selectedRows: Row[], isNew: boolean) {
     setBaName(name);
     setBaData(selectedRows);
     setBaIsNew(isNew);
-    setActiveModal(null);
   }
 
-  function handleBbSelect(name: string, selectedRows: Row[], isNew: boolean) {
-    setBbName(name);
-    setBbData(selectedRows);
-    setBbIsNew(isNew);
-    setActiveModal(null);
+  function handleClearBaSelect() {
+    setBaName(null);
+    setBaData([]);
+    setBaIsNew(false);
   }
 
   async function handleRun() {
@@ -107,12 +110,8 @@ export default function TicketList() {
         await importBAList(baName, baData);
         setBaIsNew(false);
       }
-      if (bbIsNew && bbName && bbData.length) {
-        await createBuildingBlock(bbName, bbData);
-        setBbIsNew(false);
-      }
       const ticketSetName = `${jiraFileName} (Checked)`;
-      const data = await runPipeline(bbData, rows, ticketSetName);
+      const data = await runPipeline(baData, rows, ticketSetName);
       setRows(data.results);
       setFilter("All");
     } catch (err) {
@@ -148,26 +147,15 @@ export default function TicketList() {
         }
         right={
           <>
-            <Button label="BA" onClick={() => setActiveModal("ba")} />
-            {baName && <span className="file-name">{baName}</span>}
-
+            <Button label="BA Rules" onClick={() => setActiveModal("ba")} />
             <Button label="Building Blocks" onClick={() => setActiveModal("bb")} />
-            {bbName && <span className="file-name">{bbName}</span>}
 
-            <input
-              ref={jiraFileRef}
-              type="file"
-              accept=".csv"
-              style={{ display: "none" }}
-              onChange={handleJiraUpload}
-            />
-            <Button label="Import" onClick={() => jiraFileRef.current?.click()} />
-            {jiraFileName && <span className="file-name">{jiraFileName}</span>}
+            <Button label="Import Tickets" onClick={() => setActiveModal("tickets")} />
 
             <Button
               label={running ? "Running..." : "Run"}
               variant="primary"
-              disabled={!bbData.length || !rows.length || running}
+              disabled={!baData.length || !rows.length || running}
               onClick={handleRun}
             />
             {runError && <span className="table-error">{runError}</span>}
@@ -180,17 +168,26 @@ export default function TicketList() {
           title="Select BA Rules"
           fetchUrl="http://localhost:3000/api/ba-lists"
           detailUrl="http://localhost:3000/api/ba-lists"
+          selectedName={baName}
           onSelect={handleBaSelect}
+          onClearSelected={handleClearBaSelect}
           onClose={() => setActiveModal(null)}
         />
       )}
 
       {activeModal === "bb" && (
-        <CsvSelectModal
-          title="Select Building Blocks"
-          fetchUrl="http://localhost:3000/api/building-blocks"
-          detailUrl="http://localhost:3000/api/building-blocks"
-          onSelect={handleBbSelect}
+        <BuildingBlockSelectModal
+          selected={selectedBuildingBlocks}
+          onChange={setSelectedBuildingBlocks}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
+
+      {activeModal === "tickets" && (
+        <TicketUploadModal
+          selectedName={jiraFileName}
+          onUpload={handleJiraUpload}
+          onClearSelected={handleClearJiraUpload}
           onClose={() => setActiveModal(null)}
         />
       )}
@@ -230,4 +227,30 @@ export default function TicketList() {
       )}
     </div>
   );
+}
+
+function normalizeTicketRow(row: Row): Row {
+  return {
+    ...row,
+    jira_ticket_id: getFirstValue(row, TICKET_FIELD_ALIASES.jira_ticket_id),
+    test_case_id: getFirstValue(row, TICKET_FIELD_ALIASES.test_case_id),
+    source_result_code: getFirstValue(row, TICKET_FIELD_ALIASES.source_result_code),
+  };
+}
+
+function getFirstValue(row: Row, keys: string[]): string {
+  const normalizedRow = Object.fromEntries(
+    Object.entries(row).map(([key, value]) => [normalizeKey(key), value])
+  );
+
+  for (const key of keys) {
+    const value = normalizedRow[normalizeKey(key)]?.trim();
+    if (value) return value;
+  }
+
+  return "";
+}
+
+function normalizeKey(key: string): string {
+  return key.trim().toLowerCase().replace(/\s+/g, "_");
 }

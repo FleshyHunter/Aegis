@@ -1,0 +1,11 @@
+.bbsm-entry-selected {
+  border-color: var(--color-accent);
+}
+
+.bbsm-selected-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: calc(4 * 41px + 3 * 4px);
+  overflow-y: auto;
+}

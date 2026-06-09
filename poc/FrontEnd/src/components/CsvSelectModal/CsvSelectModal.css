@@ -150,3 +150,51 @@
   color: var(--color-danger);
   padding: 4px 0;
 }
+
+.csm-selected {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--color-accent);
+  border-radius: 8px;
+  background-color: rgba(35, 134, 54, 0.08);
+}
+
+.csm-selected-check {
+  color: var(--color-accent);
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.csm-selected-file-icon {
+  color: var(--color-text-muted);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.csm-selected-name {
+  font-size: 13px;
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.csm-selected-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.csm-selected-delete:hover {
+  color: var(--color-danger);
+}

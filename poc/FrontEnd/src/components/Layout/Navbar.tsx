@@ -11,8 +11,8 @@ export default function Navbar() {
         <NavLink to="/" end className={({ isActive }) => isActive ? "navbar-pill active" : "navbar-pill"}>Home</NavLink>
         <NavLink to="/ba" className={({ isActive }) => isActive ? "navbar-pill active" : "navbar-pill"}>BA Rules</NavLink>
         <NavLink to="/building-blocks" className={({ isActive }) => isActive ? "navbar-pill active" : "navbar-pill"}>Building Blocks</NavLink>
-        <NavLink to="/ticket-sets" className={({ isActive }) => isActive ? "navbar-pill active" : "navbar-pill"}>Ticket Sets</NavLink>
         <NavLink to="/tickets" className={({ isActive }) => isActive ? "navbar-pill active" : "navbar-pill"}>Tickets</NavLink>
+        <NavLink to="/ticket-sets" className={({ isActive }) => isActive ? "navbar-pill active" : "navbar-pill"}>Ticket Sets</NavLink>
       </nav>
     </header>
   );

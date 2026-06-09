@@ -170,3 +170,48 @@
   padding: 12px 32px;
   font-size: 13px;
 }
+
+.bb-doc-view {
+  padding: 24px 32px;
+}
+
+.bb-doc-metadata {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 0 0 24px;
+}
+
+.bb-doc-metadata div {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 10px;
+}
+
+.bb-doc-metadata dt {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.bb-doc-metadata dd {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.bb-doc-placeholder {
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  padding: 24px;
+  border-radius: 6px;
+}
+
+.bb-doc-preview-text {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+}
