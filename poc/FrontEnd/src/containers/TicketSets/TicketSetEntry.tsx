@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../../components/Layout/Navbar";
-import { usePagination } from "../../components/Pagination/usePagination";
-import Pagination from "../../components/Pagination/Pagination";
 import "./TicketSets.css";
 
 interface TicketSetDetail {
   id: string;
   name: string;
-  columns: string[];
-  rows: Record<string, string>[];
+  source_filename: string;
+  source_type: string;
   row_count: number;
   created_at: string;
 }
@@ -29,13 +27,9 @@ export default function TicketSetEntry() {
       })
       .then((data) => {
         setEntry(data);
-        pagination.reset();
       })
       .catch((err) => setError(err.message));
   }, [id]);
-
-  const pagination = usePagination(entry?.rows ?? [], 20);
-  const { pageItems, startIndex } = pagination;
 
   return (
     <div>
@@ -56,34 +50,25 @@ export default function TicketSetEntry() {
       {error && <p className="ts-error">{error}</p>}
 
       {entry && (
-        <div className="ts-table-wrapper">
-          <table className="ts-table">
-            <thead>
-              <tr>
-                {entry.columns.map((col) => (
-                  <th key={col}>{col}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {pageItems.map((row, i) => (
-                <tr key={startIndex + i}>
-                  {entry.columns.map((col) => (
-                    <td key={col}>{row[col] || "—"}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <Pagination
-            currentPage={pagination.currentPage}
-            totalPages={pagination.totalPages}
-            startIndex={startIndex}
-            perPage={pagination.perPage}
-            totalItems={pagination.totalItems}
-            onPrev={() => pagination.setPage((p) => p - 1)}
-            onNext={() => pagination.setPage((p) => p + 1)}
-          />
+        <div className="ts-detail-panel">
+          <dl className="ts-detail-grid">
+            <div>
+              <dt>Name</dt>
+              <dd>{entry.name}</dd>
+            </div>
+            <div>
+              <dt>Source filename</dt>
+              <dd>{entry.source_filename || "—"}</dd>
+            </div>
+            <div>
+              <dt>Source type</dt>
+              <dd>{entry.source_type}</dd>
+            </div>
+            <div>
+              <dt>Row count</dt>
+              <dd>{entry.row_count}</dd>
+            </div>
+          </dl>
         </div>
       )}
     </div>

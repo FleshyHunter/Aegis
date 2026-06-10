@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { BsPlayFill } from "react-icons/bs";
 import "./TicketList.css";
 import Navbar from "../../components/Layout/Navbar";
 import Button from "../../components/Button/Button";
@@ -72,6 +73,7 @@ export default function TicketList() {
   const [baData, setBaData] = useState<Row[]>([]);
   const [baIsNew, setBaIsNew] = useState(false);
   const [selectedBuildingBlocks, setSelectedBuildingBlocks] = useState<BuildingBlockSelection[]>([]);
+  const [userPrompt, setUserPrompt] = useState("");
 
   const [activeModal, setActiveModal] = useState<ModalTarget>(null);
   const [running, setRunning] = useState<boolean>(false);
@@ -154,6 +156,7 @@ export default function TicketList() {
 
             <Button
               label={running ? "Running..." : "Run"}
+              icon={<BsPlayFill />}
               variant="primary"
               disabled={!baData.length || !rows.length || running}
               onClick={handleRun}
@@ -162,6 +165,19 @@ export default function TicketList() {
           </>
         }
       />
+
+      <section className="run-context-panel">
+        <label className="run-context-label" htmlFor="ticket-run-context">
+          Additional Evaluation Context
+        </label>
+        <textarea
+          id="ticket-run-context"
+          className="run-context-textarea"
+          value={userPrompt}
+          onChange={(e) => setUserPrompt(e.target.value)}
+          placeholder="Optional context for this run. This supports the evaluator but does not override the core validation rules."
+        />
+      </section>
 
       {activeModal === "ba" && (
         <CsvSelectModal

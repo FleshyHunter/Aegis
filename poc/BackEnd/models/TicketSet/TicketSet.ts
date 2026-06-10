@@ -1,27 +1,31 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-export interface ITicketSetItem {
-  [key: string]: string;
-}
+export type TicketSetSourceType = "csv" | "docx" | "jira_api" | "pipeline_result";
 
 export interface ITicketSet extends Document {
   name: string;
-  columns: string[];
-  rows: ITicketSetItem[];
+  source_filename: string;
+  source_type: TicketSetSourceType;
   row_count: number;
   created_at: Date;
+  updated_at: Date;
 }
 
 const TicketSetSchema = new Schema<ITicketSet>(
   {
-    name:      { type: String, required: true },
-    columns:   { type: [String], default: [] },
-    rows:      { type: Schema.Types.Mixed, default: [] },
-    row_count: { type: Number, default: 0 },
+    name:            { type: String, required: true, index: true },
+    source_filename: { type: String, default: "" },
+    source_type: {
+      type: String,
+      enum: ["csv", "docx", "jira_api", "pipeline_result"],
+      default: "csv",
+      index: true,
+    },
+    row_count:       { type: Number, default: 0 },
   },
   {
     collection: "TicketSets",
-    timestamps: { createdAt: "created_at", updatedAt: false },
+    timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
   }
 );
 

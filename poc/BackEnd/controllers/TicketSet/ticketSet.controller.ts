@@ -13,6 +13,9 @@ export async function getAllTicketSetsController(_req: Request, res: Response): 
     res.json(list.map((entry) => ({
       id: entry._id,
       name: entry.name,
+      source_filename: entry.source_filename,
+      source_type: entry.source_type,
+      row_count: entry.row_count,
       created_at: entry.created_at,
     })));
   } catch (err) {
@@ -31,8 +34,8 @@ export async function getTicketSetByIdController(req: Request<{ id: string }>, r
     res.json({
       id: entry._id,
       name: entry.name,
-      columns: entry.columns,
-      rows: entry.rows,
+      source_filename: entry.source_filename,
+      source_type: entry.source_type,
       row_count: entry.row_count,
       created_at: entry.created_at,
     });
@@ -76,16 +79,28 @@ export async function deleteTicketSetController(req: Request<{ id: string }>, re
 }
 
 export async function createTicketSetController(req: Request, res: Response): Promise<void> {
-  const { name, rows } = req.body;
-  if (!name || !Array.isArray(rows) || !rows.length) {
-    res.status(400).json({ error: "name and rows are required." });
+  const { name, rows, sourceFilename, sourceType } = req.body;
+  if (!name || typeof name !== "string" || !name.trim()) {
+    res.status(400).json({ error: "name is required." });
     return;
   }
+
+  if (rows !== undefined && !Array.isArray(rows)) {
+    res.status(400).json({ error: "rows must be an array when provided." });
+    return;
+  }
+
   try {
-    const entry = await createTicketSet(name, rows);
+    const entry = await createTicketSet(name.trim(), rows ?? [], {
+      sourceFilename,
+      sourceType,
+    });
     res.status(201).json({
       id: entry._id,
       name: entry.name,
+      source_filename: entry.source_filename,
+      source_type: entry.source_type,
+      row_count: entry.row_count,
       created_at: entry.created_at,
     });
   } catch (err) {

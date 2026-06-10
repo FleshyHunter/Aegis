@@ -63,7 +63,12 @@ export default function Home() {
           {displayed}
           {typing && <span className="hero-cursor" />}
         </p>
-        <Button label="Get Started" variant="primary" onClick={() => navigate("/tickets")} />
+        <Button
+          label="Get Started"
+          variant="primary"
+          onClick={() => navigate("/tickets")}
+          style={{ padding: "10px 24px", fontSize: "16px" }}
+        />
 
         <div className="home-nav-buttons">
           <Button label="BA Rules" variant="secondary" onClick={() => navigate("/ba")} />

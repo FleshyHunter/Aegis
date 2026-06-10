@@ -1,6 +1,12 @@
 import mongoose from "mongoose";
 import { loadEnv } from "../config/env";
-import { BAList, BuildingBlock, TicketSet } from "../models";
+import {
+  BAList,
+  BuildingBlock,
+  DerivedTestCase,
+  RawTestCase,
+  TicketSet,
+} from "../models";
 
 loadEnv();
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/idemia";
@@ -25,12 +31,16 @@ async function initializeCollections(): Promise<void> {
   await Promise.all([
     BAList.createCollection(),
     BuildingBlock.createCollection(),
+    DerivedTestCase.createCollection(),
+    RawTestCase.createCollection(),
     TicketSet.createCollection(),
   ]);
 
   await Promise.all([
     BAList.syncIndexes(),
     BuildingBlock.syncIndexes(),
+    DerivedTestCase.syncIndexes(),
+    RawTestCase.syncIndexes(),
     TicketSet.syncIndexes(),
   ]);
 }

@@ -3,6 +3,44 @@
   color: var(--color-text-muted);
 }
 
+.run-context-panel {
+  padding: 16px 32px;
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-bg-primary);
+}
+
+.run-context-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.run-context-textarea {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  font: inherit;
+  line-height: 1.5;
+}
+
+.run-context-textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.run-context-textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
 .table-wrapper {
   overflow-x: auto;
   padding: 24px 32px;

@@ -1,4 +1,8 @@
 .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   cursor: pointer;
   font-family: inherit;
   font-size: 14px;
@@ -11,6 +15,13 @@
   transition: background-color 0.1s ease, border-color 0.1s ease;
 }
 
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
 .btn:hover {
   background-color: #30363d;
   border-color: #8d96a0;
@@ -20,8 +31,6 @@
   background-color: var(--color-accent);
   border-color: var(--color-accent);
   color: #fff;
-  padding: 10px 24px;
-  font-size: 16px;
 }
 
 .btn-primary:hover {

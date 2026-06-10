@@ -1,9 +1,6 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { BsTrash } from "react-icons/bs";
-import {
-  fetchBuildingBlocks,
-  uploadBuildingBlock,
-} from "../../api/api";
+import { fetchBuildingBlocks } from "../../api/api";
 import "../CsvSelectModal/CsvSelectModal.css";
 import "./BuildingBlockSelectModal.css";
 
@@ -11,6 +8,8 @@ export interface BuildingBlockSelection {
   id: string;
   name: string;
   created_at: string;
+  isNew?: boolean;
+  file?: File;
 }
 
 interface Props {
@@ -26,7 +25,6 @@ export default function BuildingBlockSelectModal({
 }: Props) {
   const [entries, setEntries] = useState<BuildingBlockSelection[]>([]);
   const [loadingList, setLoadingList] = useState(true);
-  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
@@ -38,32 +36,22 @@ export default function BuildingBlockSelectModal({
       .finally(() => setLoadingList(false));
   }, []);
 
-  async function handleFileUpload(e: ChangeEvent<HTMLInputElement>) {
+  function handleFileUpload(e: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     if (!files.length) return;
 
-    setUploading(true);
     setError(null);
 
-    try {
-      const uploaded: BuildingBlockSelection[] = [];
-      for (const file of files) {
-        const saved = await uploadBuildingBlock(file);
-        uploaded.push({
-          id: saved.id,
-          name: saved.name,
-          created_at: saved.created_at,
-        });
-      }
+    const pendingSelections = files.map((file) => ({
+      id: `pending:${file.name}:${file.lastModified}:${file.size}`,
+      name: file.name,
+      created_at: new Date().toISOString(),
+      isNew: true,
+      file,
+    }));
 
-      setEntries((current) => mergeUnique(uploaded, current));
-      onChange(mergeUnique(selected, uploaded));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed.");
-    } finally {
-      setUploading(false);
-      e.target.value = "";
-    }
+    onChange(mergeUnique(selected, pendingSelections));
+    e.target.value = "";
   }
 
   function toggleSelected(entry: BuildingBlockSelection) {
@@ -101,8 +89,8 @@ export default function BuildingBlockSelectModal({
             style={{ display: "none" }}
             onChange={handleFileUpload}
           />
-          <button className="btn" disabled={uploading} onClick={() => fileRef.current?.click()}>
-            {uploading ? "Uploading..." : "Choose DOCX files"}
+          <button className="btn" onClick={() => fileRef.current?.click()}>
+            Choose DOCX files
           </button>
         </div>
 
@@ -153,6 +141,7 @@ export default function BuildingBlockSelectModal({
               {selected.map((entry) => (
                 <div className="csm-selected" key={entry.id}>
                   <span className="csm-selected-name">{entry.name}</span>
+                  {entry.isNew && <span className="bbsm-pending-label">Pending upload</span>}
                   <button
                     className="csm-selected-delete"
                     title="Remove selected building block"
