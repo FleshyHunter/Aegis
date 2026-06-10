@@ -1,8 +1,12 @@
 import mongoose, { Document, Schema, Types } from "mongoose";
-import type { LabelHint, RawStepRow } from "../RawTestCase/RawTestCase";
+
+export type LabelHint = "Pass" | "Failed" | "Skipped" | "";
+
+export type RawStepRow = [string, string];
 
 export type ResultCodeSource =
   | "title_brackets[1]"
+  | "source_result_code"
   | "fallback_bracket_scan"
   | "fallback_title_text"
   | "not_found";
@@ -15,10 +19,10 @@ export interface IDerivedStep {
   expected: string[];
 }
 
-export interface IDerivedTestCase extends Document {
-  raw_test_case_id: Types.ObjectId;
-  ticket_set_id: Types.ObjectId;
-  parse_version: string;
+export interface DerivedTestCaseTableRow extends Record<string, unknown> {
+  jira_ticket_id: string;
+  test_case_id: string;
+  source_result_code: string;
   title_raw: string;
   product_name: string;
   title_brackets_json: string[];
@@ -42,20 +46,28 @@ export interface IDerivedTestCase extends Document {
   steps_json: IDerivedStep[];
   label_hint: LabelHint;
   routing_key: string | null;
+}
+
+export interface IDerivedTestCase extends Document {
+  ticket_set_id: Types.ObjectId;
+  raw_test_case_id: Types.ObjectId;
+  name: string;
+  source_filename: string;
+  parse_version: string;
+  columns: string[];
+  rows: DerivedTestCaseTableRow[];
+  row_count: number;
   created_at: Date;
 }
 
-const DerivedStepSchema = new Schema<IDerivedStep>(
-  {
-    step:     { type: Number, required: true, min: 1 },
-    action:   { type: String, default: "" },
-    expected: { type: [String], default: [] },
-  },
-  { _id: false }
-);
-
 const DerivedTestCaseSchema = new Schema<IDerivedTestCase>(
   {
+    ticket_set_id: {
+      type: Schema.Types.ObjectId,
+      ref: "TicketSet",
+      required: true,
+      index: true,
+    },
     raw_test_case_id: {
       type: Schema.Types.ObjectId,
       ref: "RawTestCase",
@@ -63,48 +75,12 @@ const DerivedTestCaseSchema = new Schema<IDerivedTestCase>(
       unique: true,
       index: true,
     },
-    ticket_set_id: {
-      type: Schema.Types.ObjectId,
-      ref: "TicketSet",
-      required: true,
-      index: true,
-    },
-    parse_version:             { type: String, required: true },
-    title_raw:                 { type: String, default: "" },
-    product_name:              { type: String, default: "" },
-    title_brackets_json:       { type: [String], default: [] },
-    result_code:               { type: String, default: "", index: true },
-    result_code_source: {
-      type: String,
-      enum: ["title_brackets[1]", "fallback_bracket_scan", "fallback_title_text", "not_found"],
-      default: "not_found",
-    },
-    title_convention_status: {
-      type: String,
-      enum: ["standard", "outlier", "invalid"],
-      default: "invalid",
-    },
-    title_parse_warnings_json: { type: [String], default: [] },
-    test_case_name:            { type: String, default: "" },
-    type:                      { type: String, default: "" },
-    components_json:           { type: [String], default: [] },
-    labels_json:               { type: [String], default: [] },
-    execution_type:            { type: String, default: "" },
-    test_repo_path:            { type: String, default: "" },
-    status:                    { type: String, default: "" },
-    resolution:                { type: String, default: "" },
-    fix_versions_json:         { type: [String], default: [] },
-    description_raw:           { type: String, default: "" },
-    description_context:       { type: String, default: "" },
-    preconditions_json:        { type: [String], default: [] },
-    steps_raw_json:            { type: Schema.Types.Mixed, default: [] },
-    steps_json:                { type: [DerivedStepSchema], default: [] },
-    label_hint: {
-      type: String,
-      enum: ["Pass", "Failed", "Skipped", ""],
-      default: "",
-    },
-    routing_key:               { type: String, default: null },
+    name:            { type: String, required: true, index: true },
+    source_filename: { type: String, default: "" },
+    parse_version:   { type: String, required: true },
+    columns:         { type: [String], default: [] },
+    rows:            { type: Schema.Types.Mixed, default: [] },
+    row_count:       { type: Number, default: 0 },
   },
   {
     collection: "DerivedTestCases",

@@ -11,12 +11,15 @@ export { TicketSet } from "./TicketSet/TicketSet";
 export type { ITicketSet, TicketSetSourceType } from "./TicketSet/TicketSet";
 
 export { RawTestCase } from "./RawTestCase/RawTestCase";
-export type { IRawTestCase, LabelHint, RawStepRow } from "./RawTestCase/RawTestCase";
+export type { IRawTestCase, SourceTestCaseRow } from "./RawTestCase/RawTestCase";
 
 export { DerivedTestCase } from "./DerivedTestCase/DerivedTestCase";
 export type {
   IDerivedTestCase,
   IDerivedStep,
+  DerivedTestCaseTableRow,
+  LabelHint,
+  RawStepRow,
   ResultCodeSource,
   TitleConventionStatus,
 } from "./DerivedTestCase/DerivedTestCase";

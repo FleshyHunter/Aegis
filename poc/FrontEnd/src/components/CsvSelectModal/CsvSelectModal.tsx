@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { BsTrash, BsCheckCircleFill, BsFileEarmarkText } from "react-icons/bs";
+import { parseCSV } from "../../utils/csv";
 import "./CsvSelectModal.css";
 
 interface Row {
@@ -17,23 +18,9 @@ interface Props {
   fetchUrl: string;
   detailUrl: string;
   selectedName?: string | null;
-  onSelect: (name: string, rows: Row[], isNew: boolean) => void;
+  onSelect: (name: string, rows: Row[], isNew: boolean, id?: string) => void;
   onClearSelected?: () => void;
   onClose: () => void;
-}
-
-function parseCSV(text: string): Row[] {
-  const [headerLine, ...lines] = text.trim().split("\n");
-  const headers = headerLine.split(",").map((h) => h.trim());
-  return lines
-    .filter((l) => l.trim())
-    .map((line) => {
-      const values = line.split(",");
-      return headers.reduce((row: Row, h, i) => {
-        row[h] = values[i]?.trim() ?? "";
-        return row;
-      }, {});
-    });
 }
 
 export default function CsvSelectModal({
@@ -78,7 +65,7 @@ export default function CsvSelectModal({
       const res = await fetch(`${detailUrl}/${entry.id}`);
       if (!res.ok) throw new Error(`Error ${res.status}`);
       const data = await res.json();
-      onSelect(entry.name, data.rows, false);
+      onSelect(entry.name, data.rows, false, entry.id);
     } catch {
       setError("Failed to load entry. Please try again.");
       setLoadingEntry(null);

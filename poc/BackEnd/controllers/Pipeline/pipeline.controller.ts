@@ -1,30 +1,37 @@
 import { Request, Response } from "express";
-import { runPipeline } from "../../services/Pipeline/pipeline.service";
-import { createTicketSet } from "../../services/TicketSet/ticketSet.service";
+import { startPipeline } from "../../services/Pipeline/pipeline.service";
 
 export async function runPipelineController(req: Request, res: Response): Promise<void> {
-  const { baData, jiraData, ticketSetName } = req.body;
+  const { ticketSetId, baListId, buildingBlockIds, userPrompt } = req.body;
 
-  if (!Array.isArray(baData) || !baData.length) {
-    res.status(400).json({ error: "baData is required and must be a non-empty array." });
+  if (!ticketSetId || typeof ticketSetId !== "string") {
+    res.status(400).json({ error: "ticketSetId is required." });
     return;
   }
 
-  if (!Array.isArray(jiraData) || !jiraData.length) {
-    res.status(400).json({ error: "jiraData is required and must be a non-empty array." });
+  if (buildingBlockIds !== undefined && !Array.isArray(buildingBlockIds)) {
+    res.status(400).json({ error: "buildingBlockIds must be an array when provided." });
     return;
   }
 
   try {
-    const results = await runPipeline(baData, jiraData);
-    const name =
-      typeof ticketSetName === "string" && ticketSetName.trim()
-        ? ticketSetName.trim()
-        : `Pipeline Results ${new Date().toISOString()}`;
-    const ticketSet = await createTicketSet(name, results);
-    res.json({ results, ticketSetId: ticketSet._id, ticketSetName: ticketSet.name });
+    const result = await startPipeline({
+      ticketSetId,
+      baListId: typeof baListId === "string" ? baListId : "",
+      buildingBlockIds: buildingBlockIds ?? [],
+      userPrompt: typeof userPrompt === "string" ? userPrompt : "",
+    });
+
+    res.json({
+      status: "started",
+      ticketSetId,
+      pipelineOutput: result.stdout,
+    });
   } catch (err) {
     console.error("[pipeline.controller]", err);
-    res.status(500).json({ error: "Pipeline failed. Check server logs." });
+    res.status(500).json({
+      error: "Pipeline failed.",
+      detail: err instanceof Error ? err.message : "Unknown error.",
+    });
   }
 }

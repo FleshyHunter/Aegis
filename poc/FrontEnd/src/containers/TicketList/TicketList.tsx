@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { BsPlayFill } from "react-icons/bs";
 import "./TicketList.css";
 import Navbar from "../../components/Layout/Navbar";
@@ -11,7 +11,8 @@ import BuildingBlockSelectModal, {
 import TicketUploadModal from "../../components/TicketUploadModal/TicketUploadModal";
 import { usePagination } from "../../components/Pagination/usePagination";
 import Pagination from "../../components/Pagination/Pagination";
-import { runPipeline, importBAList } from "../../api/api";
+import { importBAList, importTicketSet, runPipeline, uploadBuildingBlock } from "../../api/api";
+import { parseCSV } from "../../utils/csv";
 
 interface Column {
   key: string;
@@ -40,20 +41,6 @@ const TICKET_FIELD_ALIASES = {
   source_result_code: ["source_result_code", "result_code", "code"],
 };
 
-function parseCSV(text: string): Row[] {
-  const [headerLine, ...lines] = text.trim().split("\n");
-  const headers = headerLine.split(",").map((h) => h.trim());
-  return lines
-    .filter((line) => line.trim())
-    .map((line) => {
-      const values = line.split(",");
-      return headers.reduce((row: Row, h, i) => {
-        row[h] = values[i]?.trim() ?? "";
-        return row;
-      }, {});
-    });
-}
-
 function readFile(file: File): Promise<Row[]> {
   return new Promise((resolve) => {
     const reader = new FileReader();
@@ -66,58 +53,95 @@ type ModalTarget = "ba" | "bb" | "tickets" | null;
 
 export default function TicketList() {
   const [rows, setRows] = useState<Row[]>([]);
+  const [rawRows, setRawRows] = useState<Row[]>([]);
   const [filter, setFilter] = useState<string>("All");
   const [jiraFileName, setJiraFileName] = useState<string | null>(null);
 
   const [baName, setBaName] = useState<string | null>(null);
+  const [baId, setBaId] = useState<string>("");
   const [baData, setBaData] = useState<Row[]>([]);
   const [baIsNew, setBaIsNew] = useState(false);
   const [selectedBuildingBlocks, setSelectedBuildingBlocks] = useState<BuildingBlockSelection[]>([]);
   const [userPrompt, setUserPrompt] = useState("");
 
   const [activeModal, setActiveModal] = useState<ModalTarget>(null);
-  const [running, setRunning] = useState<boolean>(false);
+  const [running, setRunning] = useState(false);
   const [runError, setRunError] = useState<string | null>(null);
+  const [runMessage, setRunMessage] = useState<string | null>(null);
 
   async function handleJiraUpload(file: File) {
     setJiraFileName(file.name);
     const parsed = await readFile(file);
+    setRawRows(parsed);
     setRows(parsed.map(normalizeTicketRow));
   }
 
   function handleClearJiraUpload() {
     setJiraFileName(null);
+    setRawRows([]);
     setRows([]);
     setFilter("All");
   }
 
-  function handleBaSelect(name: string, selectedRows: Row[], isNew: boolean) {
+  function handleBaSelect(name: string, selectedRows: Row[], isNew: boolean, id?: string) {
     setBaName(name);
+    setBaId(id ?? "");
     setBaData(selectedRows);
     setBaIsNew(isNew);
   }
 
   function handleClearBaSelect() {
     setBaName(null);
+    setBaId("");
     setBaData([]);
     setBaIsNew(false);
   }
 
   async function handleRun() {
-    if (!jiraFileName) return;
+    if (!jiraFileName || !rawRows.length) return;
+
     setRunning(true);
     setRunError(null);
+    setRunMessage(null);
+
     try {
+      let baListId = baId;
       if (baIsNew && baName && baData.length) {
-        await importBAList(baName, baData);
+        const createdBa = await importBAList(baName, baData);
+        baListId = createdBa.id;
+        setBaId(createdBa.id);
         setBaIsNew(false);
       }
-      const ticketSetName = `${jiraFileName} (Checked)`;
-      const data = await runPipeline(baData, rows, ticketSetName);
-      setRows(data.results);
-      setFilter("All");
+
+      const uploadedBuildingBlocks = await Promise.all(
+        selectedBuildingBlocks.map(async (entry) => {
+          if (!entry.isNew || !entry.file) return entry;
+          const created = await uploadBuildingBlock(entry.file);
+          return {
+            id: created.id,
+            name: created.name,
+            created_at: created.created_at,
+          };
+        })
+      );
+      setSelectedBuildingBlocks(uploadedBuildingBlocks);
+
+      const ticketSet = await importTicketSet(
+        `${jiraFileName} import`,
+        jiraFileName,
+        rawRows
+      );
+
+      await runPipeline({
+        ticketSetId: ticketSet.id,
+        baListId,
+        buildingBlockIds: uploadedBuildingBlocks.map((entry) => entry.id),
+        userPrompt,
+      });
+
+      setRunMessage("Pipeline started. Derived test cases are available in Ticket Sets.");
     } catch (err) {
-      setRunError(err instanceof Error ? err.message : "Pipeline failed.");
+      setRunError(err instanceof Error ? err.message : "Run failed.");
     } finally {
       setRunning(false);
     }
@@ -158,10 +182,11 @@ export default function TicketList() {
               label={running ? "Running..." : "Run"}
               icon={<BsPlayFill />}
               variant="primary"
-              disabled={!baData.length || !rows.length || running}
+              disabled={!rows.length || running}
               onClick={handleRun}
             />
             {runError && <span className="table-error">{runError}</span>}
+            {runMessage && <span className="table-status">{runMessage}</span>}
           </>
         }
       />
@@ -250,7 +275,6 @@ function normalizeTicketRow(row: Row): Row {
     ...row,
     jira_ticket_id: getFirstValue(row, TICKET_FIELD_ALIASES.jira_ticket_id),
     test_case_id: getFirstValue(row, TICKET_FIELD_ALIASES.test_case_id),
-    source_result_code: getFirstValue(row, TICKET_FIELD_ALIASES.source_result_code),
   };
 }
 

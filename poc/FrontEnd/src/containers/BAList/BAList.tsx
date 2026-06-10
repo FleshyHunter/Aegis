@@ -5,30 +5,13 @@ import Navbar from "../../components/Layout/Navbar";
 import { usePopup } from "../../components/PopUp/PopupContext";
 import { usePagination } from "../../components/Pagination/usePagination";
 import Pagination from "../../components/Pagination/Pagination";
+import { parseCSV } from "../../utils/csv";
 import "./BAList.css";
 
 interface BAListEntry {
   id: string;
   name: string;
   created_at: string;
-}
-
-interface Row {
-  [key: string]: string;
-}
-
-function parseCSV(text: string): Row[] {
-  const [headerLine, ...lines] = text.trim().split("\n");
-  const headers = headerLine.split(",").map((h) => h.trim());
-  return lines
-    .filter((l) => l.trim())
-    .map((line) => {
-      const values = line.split(",");
-      return headers.reduce((row: Row, h, i) => {
-        row[h] = values[i]?.trim() ?? "";
-        return row;
-      }, {});
-    });
 }
 
 export default function BAList() {

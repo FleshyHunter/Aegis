@@ -1,23 +1,42 @@
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export async function runPipeline(
-  baData: Record<string, string>[],
-  jiraData: Record<string, string>[],
-  ticketSetName?: string,
+  input: {
+    ticketSetId: string;
+    baListId?: string;
+    buildingBlockIds?: string[];
+    userPrompt?: string;
+  },
 ) {
   const res = await fetch(`${BASE_URL}/api/run`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ baData, jiraData, ticketSetName }),
+    body: JSON.stringify(input),
   });
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
+  await assertOk(res);
   return res.json();
 }
 
 async function requestJson(path: string, options?: RequestInit) {
   const res = await fetch(`${BASE_URL}${path}`, options);
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
+  await assertOk(res);
   return res.json();
+}
+
+async function assertOk(res: Response) {
+  if (res.ok) return;
+
+  let message = `API error: ${res.status}`;
+  try {
+    const body = await res.json();
+    const detail = [body.error, body.detail].filter(Boolean).join(" ");
+    if (detail) message = detail;
+  } catch {
+    const text = await res.text().catch(() => "");
+    if (text) message = text;
+  }
+
+  throw new Error(message);
 }
 
 export async function importBAList(name: string, rows: Record<string, string>[]) {
@@ -68,4 +87,24 @@ export async function createTicketSet(name: string, rows: Record<string, string>
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, rows }),
   });
+}
+
+export async function importTicketSet(
+  name: string,
+  sourceFilename: string,
+  rows: Record<string, string>[]
+) {
+  return requestJson("/api/ticket-sets/import", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, sourceFilename, rows }),
+  });
+}
+
+export async function fetchDerivedTestCasesForTicketSet(id: string) {
+  return requestJson(`/api/ticket-sets/${id}/derived-test-cases`);
+}
+
+export async function fetchRawTestCasesForTicketSet(id: string) {
+  return requestJson(`/api/ticket-sets/${id}/raw-test-cases`);
 }
