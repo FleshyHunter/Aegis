@@ -16,25 +16,29 @@ interface ResultCodeParse {
 const DERIVED_COLUMNS = [
   "jira_ticket_id",
   "test_case_id",
-  "source_result_code",
-  "result_code",
-  "test_case_name",
   "title_raw",
   "product_name",
-  "title_convention_status",
-  "type",
-  "status",
-  "label_hint",
+  "title_brackets",
+  "result_code",
   "result_code_source",
-  "components_json",
-  "labels_json",
+  "title_convention_status",
+  "title_parse_warnings",
+  "test_case_name",
+  "type",
+  "components",
+  "labels",
   "execution_type",
   "test_repo_path",
+  "status",
   "resolution",
-  "fix_versions_json",
+  "fix_versions",
+  "description_raw",
   "description_context",
-  "preconditions_json",
-  "steps_json",
+  "preconditions",
+  "steps_raw",
+  "steps",
+  "label_hint",
+  "routing_key",
 ];
 
 export async function createDerivedTestCaseTableFromRaw(
@@ -47,7 +51,6 @@ export async function createDerivedTestCaseTableFromRaw(
     raw_test_case_id: rawTestCase._id,
     name: `${rawTestCase.name} derived`,
     source_filename: rawTestCase.source_filename,
-    parse_version: "v1",
     columns: DERIVED_COLUMNS,
     rows,
     row_count: rows.length,
@@ -60,37 +63,35 @@ export async function getDerivedTestCaseTableByTicketSetId(ticketSetId: string) 
 
 function buildDerivedRow(row: SourceTestCaseRow): DerivedTestCaseTableRow {
   const titleRaw = getFirstValue(row, ["title_raw", "title", "summary"]);
-  const sourceResultCode = getFirstValue(row, ["source_result_code", "result_code", "code"]);
   const brackets = extractTitleBrackets(titleRaw);
-  const resultCode = getResultCode(titleRaw, sourceResultCode, brackets);
+  const resultCode = getResultCode(titleRaw, brackets);
   const descriptionRaw = getFirstValue(row, ["description_raw", "description"]);
   const stepsRaw = getStepsRaw(row);
 
   return {
     jira_ticket_id: getFirstValue(row, ["jira_ticket_id", "ticket_id", "jira_key", "issue_key", "key"]),
     test_case_id: getFirstValue(row, ["test_case_id", "testcase_id", "test_id", "case_id"]),
-    source_result_code: sourceResultCode,
     title_raw: titleRaw,
     product_name: brackets[0] ?? "",
-    title_brackets_json: brackets,
+    title_brackets: brackets,
     result_code: resultCode.value,
     result_code_source: resultCode.source,
     title_convention_status: getTitleConventionStatus(titleRaw, brackets),
-    title_parse_warnings_json: getTitleWarnings(titleRaw, brackets, resultCode.value),
+    title_parse_warnings: getTitleWarnings(titleRaw, brackets, resultCode.value),
     test_case_name: stripTitleBrackets(titleRaw),
     type: getFirstValue(row, ["type", "issue_type"]),
-    components_json: splitList(getFirstValue(row, ["components"])),
-    labels_json: splitList(getFirstValue(row, ["labels"])),
+    components: splitList(getFirstValue(row, ["components"])),
+    labels: splitList(getFirstValue(row, ["labels"])),
     execution_type: getFirstValue(row, ["execution_type"]),
     test_repo_path: getFirstValue(row, ["test_repo_path"]),
     status: getFirstValue(row, ["status"]),
     resolution: getFirstValue(row, ["resolution"]),
-    fix_versions_json: splitList(getFirstValue(row, ["fix_versions", "fix_version"])),
+    fix_versions: splitList(getFirstValue(row, ["fix_versions", "fix_version"])),
     description_raw: descriptionRaw,
     description_context: extractDescriptionContext(descriptionRaw),
-    preconditions_json: extractPreconditions(descriptionRaw),
-    steps_raw_json: stepsRaw,
-    steps_json: stepsRaw.map(([action, expected], index) => ({
+    preconditions: extractPreconditions(descriptionRaw),
+    steps_raw: stepsRaw,
+    steps: stepsRaw.map(([action, expected], index) => ({
       step: index + 1,
       action,
       expected: splitExpectedResults(expected),
@@ -101,6 +102,20 @@ function buildDerivedRow(row: SourceTestCaseRow): DerivedTestCaseTableRow {
 }
 
 function getStepsRaw(row: SourceTestCaseRow): RawStepRow[] {
+  const stepsRaw = getFirstValue(row, ["steps_raw", "steps"]);
+  if (stepsRaw) {
+    try {
+      const parsed = JSON.parse(stepsRaw);
+      if (Array.isArray(parsed)) {
+        return parsed
+          .filter((entry): entry is [unknown, unknown] => Array.isArray(entry) && entry.length >= 2)
+          .map(([action, expected]) => [String(action ?? ""), String(expected ?? "")]);
+      }
+    } catch {
+      // Fall through to the legacy action/expected columns below.
+    }
+  }
+
   const action = getFirstValue(row, ["action", "jira_action"]);
   const expected = getFirstValue(row, ["expectation", "expected_result", "jira_expectation"]);
   return action || expected ? [[action, expected]] : [];
@@ -137,15 +152,10 @@ function extractTitleBrackets(title: string): string[] {
 
 function getResultCode(
   title: string,
-  sourceResultCode: string,
   brackets: string[]
 ): ResultCodeParse {
   if (brackets[1]) {
     return { value: brackets[1], source: "title_brackets[1]" };
-  }
-
-  if (sourceResultCode) {
-    return { value: sourceResultCode, source: "source_result_code" };
   }
 
   const bracketMatch = brackets.find((value) => /[A-Z]{1,5}\d{1,6}/i.test(value));
@@ -163,6 +173,7 @@ function getResultCode(
 
 function getTitleConventionStatus(title: string, brackets: string[]): TitleConventionStatus {
   if (!title.trim()) return "invalid";
+  if (!brackets.length) return "invalid";
   return brackets.length >= 2 ? "standard" : "outlier";
 }
 
@@ -196,7 +207,8 @@ function extractPreconditions(description: string): string[] {
 
   return parts[1]
     .split(/\r?\n/)
-    .map((line) => line.replace(/^[-*]\s*/, "").trim())
+    .filter((line) => line.trim().startsWith("-"))
+    .map((line) => line.replace(/^-\s*/, "").trim())
     .filter(Boolean);
 }
 

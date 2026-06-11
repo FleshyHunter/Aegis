@@ -6,7 +6,6 @@ export type RawStepRow = [string, string];
 
 export type ResultCodeSource =
   | "title_brackets[1]"
-  | "source_result_code"
   | "fallback_bracket_scan"
   | "fallback_title_text"
   | "not_found";
@@ -22,28 +21,27 @@ export interface IDerivedStep {
 export interface DerivedTestCaseTableRow extends Record<string, unknown> {
   jira_ticket_id: string;
   test_case_id: string;
-  source_result_code: string;
   title_raw: string;
   product_name: string;
-  title_brackets_json: string[];
+  title_brackets: string[];
   result_code: string;
   result_code_source: ResultCodeSource;
   title_convention_status: TitleConventionStatus;
-  title_parse_warnings_json: string[];
+  title_parse_warnings: string[];
   test_case_name: string;
   type: string;
-  components_json: string[];
-  labels_json: string[];
+  components: string[];
+  labels: string[];
   execution_type: string;
   test_repo_path: string;
   status: string;
   resolution: string;
-  fix_versions_json: string[];
+  fix_versions: string[];
   description_raw: string;
   description_context: string;
-  preconditions_json: string[];
-  steps_raw_json: RawStepRow[];
-  steps_json: IDerivedStep[];
+  preconditions: string[];
+  steps_raw: RawStepRow[];
+  steps: IDerivedStep[];
   label_hint: LabelHint;
   routing_key: string | null;
 }
@@ -53,7 +51,6 @@ export interface IDerivedTestCase extends Document {
   raw_test_case_id: Types.ObjectId;
   name: string;
   source_filename: string;
-  parse_version: string;
   columns: string[];
   rows: DerivedTestCaseTableRow[];
   row_count: number;
@@ -77,7 +74,6 @@ const DerivedTestCaseSchema = new Schema<IDerivedTestCase>(
     },
     name:            { type: String, required: true, index: true },
     source_filename: { type: String, default: "" },
-    parse_version:   { type: String, required: true },
     columns:         { type: [String], default: [] },
     rows:            { type: Schema.Types.Mixed, default: [] },
     row_count:       { type: Number, default: 0 },

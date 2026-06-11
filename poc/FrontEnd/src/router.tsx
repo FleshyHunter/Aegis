@@ -1,4 +1,3 @@
-import React from "react";
 import { createBrowserRouter } from "react-router-dom";
 import Home from "./containers/Home/Home";
 import BAList from "./containers/BAList/BAList";
@@ -8,6 +7,10 @@ import BuildingBlockEntry from "./containers/BuildingBlocks/BuildingBlockEntry";
 import TicketList from "./containers/TicketList/TicketList";
 import TicketSets from "./containers/TicketSets/TicketSets";
 import TicketSetEntry from "./containers/TicketSets/TicketSetEntry";
+import TicketSetRaw from "./containers/TicketSets/TicketSetRaw";
+import TicketSetDerived from "./containers/TicketSets/TicketSetDerived";
+import TicketSetPipeline from "./containers/TicketSets/TicketSetPipeline";
+import TicketSetResults from "./containers/TicketSets/TicketSetResults";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +40,22 @@ const router = createBrowserRouter([
   {
     path: "/ticket-sets/:id",
     element: <TicketSetEntry />,
+  },
+  {
+    path: "/ticket-sets/:id/raw",
+    element: <TicketSetRaw />,
+  },
+  {
+    path: "/ticket-sets/:id/derived",
+    element: <TicketSetDerived />,
+  },
+  {
+    path: "/ticket-sets/:id/pipeline",
+    element: <TicketSetPipeline />,
+  },
+  {
+    path: "/ticket-sets/:id/results",
+    element: <TicketSetResults />,
   },
   {
     path: "/tickets",

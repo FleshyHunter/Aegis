@@ -113,7 +113,7 @@ export default function TicketSets() {
                 <tr key={entry.id}>
                   <td
                     className="ts-name-link"
-                    onClick={() => navigate(`/ticket-sets/${entry.id}`, { state: entry })}
+                    onClick={() => navigate(`/ticket-sets/${entry.id}/raw`, { state: entry })}
                   >
                     {entry.name}
                   </td>
@@ -123,7 +123,7 @@ export default function TicketSets() {
                       <button
                         className="ts-icon-btn"
                         title="View"
-                        onClick={() => navigate(`/ticket-sets/${entry.id}`, { state: entry })}
+                        onClick={() => navigate(`/ticket-sets/${entry.id}/raw`, { state: entry })}
                       >
                         <BsEye />
                       </button>

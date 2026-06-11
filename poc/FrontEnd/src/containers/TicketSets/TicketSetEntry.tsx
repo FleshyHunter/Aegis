@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Navbar from "../../components/Layout/Navbar";
 import { fetchRawTestCasesForTicketSet } from "../../api/api";
 import "./TicketSets.css";
@@ -15,7 +15,7 @@ interface TicketSetDetail {
   created_at: string;
 }
 
-interface TableData {
+export interface TableData {
   id: string;
   name: string;
   columns: string[];
@@ -27,15 +27,32 @@ interface TableRow {
   [key: string]: unknown;
 }
 
-export default function TicketSetEntry() {
+interface TicketSetTableViewProps {
+  emptyMessage: string;
+  fetchTable?: (id: string) => Promise<TableData>;
+}
+
+const VIEW_TABS = [
+  { key: "raw", label: "Raw", path: "raw" },
+  { key: "derived", label: "Derived", path: "derived" },
+  { key: "pipeline", label: "Pipeline", path: "pipeline" },
+  { key: "results", label: "Results", path: "results" },
+];
+
+export function TicketSetTableView({ emptyMessage, fetchTable }: TicketSetTableViewProps) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [entry, setEntry] = useState<TicketSetDetail | null>(null);
   const [tableData, setTableData] = useState<TableData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
+
+    setError(null);
+    setTableData(null);
+
     fetch(`http://localhost:3000/api/ticket-sets/${id}`)
       .then((r) => {
         if (!r.ok) throw new Error(`Error ${r.status}`);
@@ -46,13 +63,15 @@ export default function TicketSetEntry() {
       })
       .catch((err) => setError(err.message));
 
-    fetchRawTestCasesForTicketSet(id)
+    if (!fetchTable) return;
+
+    fetchTable(id)
       .then(setTableData)
       .catch((err) => {
         setTableData(null);
-        setError(err instanceof Error ? err.message : "Failed to load raw test cases.");
+        setError(err instanceof Error ? err.message : "Failed to load ticket set data.");
       });
-  }, [id]);
+  }, [fetchTable, id]);
 
   const tableRows = tableData?.rows ?? [];
   const tableColumns = getDisplayColumns(tableData?.columns ?? [], tableRows);
@@ -72,6 +91,26 @@ export default function TicketSetEntry() {
           </>
         )}
       </div>
+
+      {entry && (
+        <div className="ts-view-tabs">
+          {VIEW_TABS.map((tab) => {
+            const target = `/ticket-sets/${entry.id}/${tab.path}`;
+            const isActive = location.pathname === target || (
+              tab.key === "raw" && location.pathname === `/ticket-sets/${entry.id}`
+            );
+            return (
+              <button
+                key={tab.key}
+                className={`ts-view-tab ${isActive ? "active" : ""}`}
+                onClick={() => navigate(target)}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {error && <p className="ts-error">{error}</p>}
 
@@ -107,7 +146,7 @@ export default function TicketSetEntry() {
           </div>
 
           {!tableRows.length ? (
-            <p className="ts-table-status">No raw test cases found for this ticket set.</p>
+            <p className="ts-table-status">{emptyMessage}</p>
           ) : (
             <div className="ts-table-wrapper">
               <table className="ts-table">
@@ -133,6 +172,15 @@ export default function TicketSetEntry() {
         </>
       )}
     </div>
+  );
+}
+
+export default function TicketSetEntry() {
+  return (
+    <TicketSetTableView
+      fetchTable={fetchRawTestCasesForTicketSet}
+      emptyMessage="No raw test cases found for this ticket set."
+    />
   );
 }
 

@@ -69,7 +69,6 @@ export async function getDerivedTestCasesForTicketSetController(
       raw_test_case_id: table.raw_test_case_id,
       name: table.name,
       source_filename: table.source_filename,
-      parse_version: table.parse_version,
       columns: table.columns,
       rows: table.rows,
       row_count: table.row_count,
