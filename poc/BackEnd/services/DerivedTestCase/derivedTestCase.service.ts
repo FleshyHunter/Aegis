@@ -8,6 +8,12 @@ import {
 } from "../../models/DerivedTestCase/DerivedTestCase";
 import type { IRawTestCase, SourceTestCaseRow } from "../../models/RawTestCase/RawTestCase";
 
+interface DerivedStep {
+  step: number;
+  action: string;
+  expected: string[];
+}
+
 interface ResultCodeParse {
   value: string;
   source: ResultCodeSource;
@@ -66,7 +72,7 @@ function buildDerivedRow(row: SourceTestCaseRow): DerivedTestCaseTableRow {
   const brackets = extractTitleBrackets(titleRaw);
   const resultCode = getResultCode(titleRaw, brackets);
   const descriptionRaw = getFirstValue(row, ["description_raw", "description"]);
-  const stepsRaw = getStepsRaw(row);
+  const stepsRaw = parseStepsRaw(getFirstRawValue(row, ["steps_raw", "steps"]));
 
   return {
     jira_ticket_id: getFirstValue(row, ["jira_ticket_id", "ticket_id", "jira_key", "issue_key", "key"]),
@@ -91,44 +97,72 @@ function buildDerivedRow(row: SourceTestCaseRow): DerivedTestCaseTableRow {
     description_context: extractDescriptionContext(descriptionRaw),
     preconditions: extractPreconditions(descriptionRaw),
     steps_raw: stepsRaw,
-    steps: stepsRaw.map(([action, expected], index) => ({
-      step: index + 1,
-      action,
-      expected: splitExpectedResults(expected),
-    })),
+    steps: deriveSteps(stepsRaw),
     label_hint: normalizeLabelHint(getFirstValue(row, ["label_hint"])),
     routing_key: null,
   };
 }
 
-function getStepsRaw(row: SourceTestCaseRow): RawStepRow[] {
-  const stepsRaw = getFirstValue(row, ["steps_raw", "steps"]);
-  if (stepsRaw) {
+function parseStepsRaw(value: unknown): RawStepRow[] {
+  if (value == null) return [];
+
+  let parsed: unknown = value;
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) return [];
+
     try {
-      const parsed = JSON.parse(stepsRaw);
-      if (Array.isArray(parsed)) {
-        return parsed
-          .filter((entry): entry is [unknown, unknown] => Array.isArray(entry) && entry.length >= 2)
-          .map(([action, expected]) => [String(action ?? ""), String(expected ?? "")]);
-      }
-    } catch {
-      // Fall through to the legacy action/expected columns below.
+      parsed = JSON.parse(trimmed);
+    } catch (error) {
+      throw new Error(
+        `steps_raw is not valid JSON: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 
-  const action = getFirstValue(row, ["action", "jira_action"]);
-  const expected = getFirstValue(row, ["expectation", "expected_result", "jira_expectation"]);
-  return action || expected ? [[action, expected]] : [];
+  if (!Array.isArray(parsed)) {
+    throw new Error("steps_raw must be an array or a JSON string representing an array");
+  }
+
+  return parsed.map((entry, index): RawStepRow => {
+    if (!Array.isArray(entry) || entry.length !== 2) {
+      throw new Error(
+        `steps_raw row ${index + 1} must be a two-item array: [action, expectedText]`
+      );
+    }
+
+    const [action, expectedText] = entry;
+    return [
+      action == null ? "" : String(action).trim(),
+      expectedText == null ? "" : String(expectedText),
+    ];
+  });
+}
+
+function deriveSteps(stepsRaw: unknown): DerivedStep[] {
+  return parseStepsRaw(stepsRaw).map(([action, expectedBlob], index): DerivedStep => ({
+    step: index + 1,
+    action,
+    expected: splitExpectedResults(expectedBlob),
+  }));
 }
 
 function getFirstValue(row: SourceTestCaseRow, keys: string[]): string {
+  const value = getFirstRawValue(row, keys);
+  return typeof value === "string" ? value.trim() : String(value ?? "").trim();
+}
+
+function getFirstRawValue(row: SourceTestCaseRow, keys: string[]): unknown {
   const normalized = Object.fromEntries(
-    Object.entries(row).map(([key, value]) => [normalizeKey(key), String(value ?? "")])
+    Object.entries(row).map(([key, value]) => [normalizeKey(key), value])
   );
 
   for (const key of keys) {
-    const value = normalized[normalizeKey(key)]?.trim();
-    if (value) return value;
+    const value = normalized[normalizeKey(key)];
+    if (value == null) continue;
+    if (typeof value === "string" && !value.trim()) continue;
+    return value;
   }
 
   return "";
@@ -197,24 +231,33 @@ function splitList(value: string): string[] {
 }
 
 function extractDescriptionContext(description: string): string {
-  const [context] = description.split(/preconditions\s*:/i);
+  const [context] = normalizeLineBreaks(description).split(/preconditions\s*:/i);
   return context.trim();
 }
 
 function extractPreconditions(description: string): string[] {
-  const parts = description.split(/preconditions\s*:/i);
-  if (parts.length < 2) return [];
+  const normalized = normalizeLineBreaks(description);
+  const match = normalized.match(/preconditions\s*:\s*([\s\S]*)/i);
+  if (!match) return [];
 
-  return parts[1]
-    .split(/\r?\n/)
-    .filter((line) => line.trim().startsWith("-"))
-    .map((line) => line.replace(/^-\s*/, "").trim())
+  return match[1]
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => /^[-*]\s+.+/.test(line))
+    .map((line) => line.replace(/^[-*]\s+/, "").trim())
     .filter(Boolean);
 }
 
 function splitExpectedResults(expected: string): string[] {
-  return expected
+  return normalizeLineBreaks(expected)
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter(Boolean);
+}
+
+function normalizeLineBreaks(value: string): string {
+  return String(value ?? "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .replace(/\\n/g, "\n");
 }

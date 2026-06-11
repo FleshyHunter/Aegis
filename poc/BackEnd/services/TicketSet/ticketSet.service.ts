@@ -1,3 +1,5 @@
+import { DerivedTestCase } from "../../models/DerivedTestCase/DerivedTestCase";
+import { RawTestCase } from "../../models/RawTestCase/RawTestCase";
 import { TicketSet } from "../../models/TicketSet/TicketSet";
 import { createDerivedTestCaseTableFromRaw } from "../DerivedTestCase/derivedTestCase.service";
 import {
@@ -68,5 +70,36 @@ export async function updateTicketSetName(id: string, name: string) {
 }
 
 export async function deleteTicketSet(id: string) {
-  return TicketSet.findByIdAndDelete(id).lean();
+  const ticketSet = await TicketSet.findById(id);
+
+  if (!ticketSet) {
+    return null;
+  }
+
+  const rawDeleteFilter = ticketSet.raw_test_case_id
+    ? {
+        $or: [
+          { ticket_set_id: ticketSet._id },
+          { _id: ticketSet.raw_test_case_id },
+        ],
+      }
+    : { ticket_set_id: ticketSet._id };
+
+  const derivedDeleteFilter = ticketSet.derived_test_case_id
+    ? {
+        $or: [
+          { ticket_set_id: ticketSet._id },
+          { _id: ticketSet.derived_test_case_id },
+        ],
+      }
+    : { ticket_set_id: ticketSet._id };
+
+  await Promise.all([
+    RawTestCase.deleteMany(rawDeleteFilter),
+    DerivedTestCase.deleteMany(derivedDeleteFilter),
+  ]);
+
+  await ticketSet.deleteOne();
+
+  return ticketSet.toObject();
 }
