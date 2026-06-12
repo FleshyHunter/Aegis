@@ -62,7 +62,7 @@ class LLMClient:
         payload: dict[str, Any] = {
             "inputs": {"query": prompt},
             "response_mode": "blocking",
-            "user": "idemia-poc",
+            "user": "aegis-poc",
         }
 
         response = self._post_json("/workflows/run", payload)

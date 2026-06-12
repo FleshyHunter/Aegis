@@ -9,7 +9,7 @@ import {
 } from "../models";
 
 loadEnv();
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/idemia";
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/AEGIS";
 
 export function getDBStatus(): string {
   const states = ["disconnected", "connected", "connecting", "disconnecting"];

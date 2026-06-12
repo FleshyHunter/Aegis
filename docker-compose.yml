@@ -2,25 +2,28 @@ services:
 
   mongo:
     image: mongo:7
-    container_name: idemia-mongo
+    container_name: aegis-mongo
     restart: unless-stopped
     ports:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
     environment:
-      MONGO_INITDB_DATABASE: idemia
+      MONGO_INITDB_DATABASE: AEGIS
 
   api:
     build:
       context: ./poc/BackEnd
       dockerfile: Dockerfile.node
-    container_name: idemia-api
+    container_name: aegis-api
     restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
-      MONGO_URI: mongodb://mongo:27017/idemia
+      MONGO_URI: mongodb://mongo:27017/AEGIS
+      JIRA_BASE_URL: ${JIRA_BASE_URL:-}
+      JIRA_EMAIL: ${JIRA_EMAIL:-}
+      JIRA_API_TOKEN: ${JIRA_API_TOKEN:-}
       NODE_ENV: production
     depends_on:
       - mongo
@@ -29,7 +32,7 @@ services:
     build:
       context: ./poc/BackEnd
       dockerfile: Dockerfile.python
-    container_name: idemia-poc-runner
+    container_name: aegis-poc-runner
     environment:
       USE_MOCK_LLM: "true"
       LLM_BASE_URL: ${LLM_BASE_URL:-}
@@ -44,7 +47,7 @@ services:
     build:
       context: ./poc/FrontEnd
       dockerfile: Dockerfile
-    container_name: idemia-frontend
+    container_name: aegis-frontend
     restart: unless-stopped
     ports:
       - "5173:5173"

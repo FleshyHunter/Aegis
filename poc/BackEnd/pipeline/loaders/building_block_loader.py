@@ -17,7 +17,7 @@ from bson.binary import Binary
 from pymongo import MongoClient
 
 
-DEFAULT_MONGO_URI = "mongodb://localhost:27017/idemia"
+DEFAULT_MONGO_URI = "mongodb://localhost:27017/AEGIS"
 BUILDING_BLOCK_COLLECTION = "BuildingBlocks"
 
 
@@ -31,7 +31,7 @@ def _mongo_uri() -> str:
 
 def _database_name(mongo_uri: str) -> str:
     database_name = mongo_uri.rsplit("/", 1)[-1].split("?", 1)[0].strip()
-    return database_name or "idemia"
+    return database_name or "AEGIS"
 
 
 def _to_object_id(value: str) -> ObjectId:

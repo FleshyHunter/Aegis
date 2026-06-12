@@ -20,6 +20,9 @@ venv/
 *.log
 npm-debug.log*
 
+# Local test data
+testdata/
+
 # OS
 .DS_Store
 Thumbs.db
@@ -30,3 +33,6 @@ Thumbs.db
 
 # Docker
 *.env.docker
+
+# LLM
+.claude/
