@@ -134,14 +134,14 @@ export function TicketSetTableView({ emptyMessage, fetchTable }: TicketSetTableV
                 <dt>Row count</dt>
                 <dd>{entry.row_count}</dd>
               </div>
-              <div>
+              {/* <div>
                 <dt>Raw table</dt>
                 <dd>{entry.raw_test_case_id || "—"}</dd>
               </div>
               <div>
                 <dt>Derived table</dt>
                 <dd>{entry.derived_test_case_id || "—"}</dd>
-              </div>
+              </div> */}
             </dl>
           </div>
 

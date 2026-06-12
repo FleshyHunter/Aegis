@@ -11,6 +11,7 @@ import os
 def main() -> None:
     payload = {
         "status": "started",
+        "pipeline_run_id": os.getenv("PIPELINE_RUN_ID", ""),
         "ticket_set_id": os.getenv("TICKET_SET_ID", ""),
         "ba_list_id": os.getenv("BA_LIST_ID", ""),
         "building_block_ids": [

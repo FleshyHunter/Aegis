@@ -23,3 +23,6 @@ export type {
   ResultCodeSource,
   TitleConventionStatus,
 } from "./DerivedTestCase/DerivedTestCase";
+
+export { PipelineRun } from "./PipelineRun/PipelineRun";
+export type { IPipelineRun, PipelineRunStatus } from "./PipelineRun/PipelineRun";

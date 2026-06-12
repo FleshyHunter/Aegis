@@ -9,6 +9,7 @@ import {
 } from "../../services/TicketSet/ticketSet.service";
 import { getDerivedTestCaseTableByTicketSetId } from "../../services/DerivedTestCase/derivedTestCase.service";
 import { getRawTestCaseTableByTicketSetId } from "../../services/RawTestCase/rawTestCase.service";
+import { getPipelineRunsByTicketSetId } from "../../services/Pipeline/pipelineRun.service";
 
 export async function getAllTicketSetsController(_req: Request, res: Response): Promise<void> {
   try {
@@ -104,6 +105,56 @@ export async function getRawTestCasesForTicketSetController(
   } catch (err) {
     console.error("[ticketSet/raw]", err);
     res.status(500).json({ error: "Failed to fetch raw test cases." });
+  }
+}
+
+export async function getPipelineRunsForTicketSetController(
+  req: Request<{ id: string }>,
+  res: Response
+): Promise<void> {
+  try {
+    const runs = await getPipelineRunsByTicketSetId(req.params.id);
+
+    res.json({
+      id: req.params.id,
+      name: "Pipeline runs",
+      columns: [
+        "run_id",
+        "run_status",
+        "ba_list_id",
+        "building_block_ids",
+        "user_prompt_text",
+        "evaluator_version",
+        "llm_provider",
+        "llm_model",
+        "ticket_count",
+        "building_block_count",
+        "error_message",
+        "started_at",
+        "completed_at",
+        "created_at",
+      ],
+      rows: runs.map((run) => ({
+        run_id: run._id,
+        run_status: run.run_status,
+        ba_list_id: run.ba_list_id,
+        building_block_ids: run.building_block_ids,
+        user_prompt_text: run.user_prompt_text,
+        evaluator_version: run.evaluator_version,
+        llm_provider: run.llm_provider,
+        llm_model: run.llm_model,
+        ticket_count: run.ticket_count,
+        building_block_count: run.building_block_count,
+        error_message: run.error_message,
+        started_at: run.started_at,
+        completed_at: run.completed_at,
+        created_at: run.created_at,
+      })),
+      row_count: runs.length,
+    });
+  } catch (err) {
+    console.error("[ticketSet/pipeline-runs]", err);
+    res.status(500).json({ error: "Failed to fetch pipeline runs." });
   }
 }
 

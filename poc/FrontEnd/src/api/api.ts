@@ -108,3 +108,7 @@ export async function fetchDerivedTestCasesForTicketSet(id: string) {
 export async function fetchRawTestCasesForTicketSet(id: string) {
   return requestJson(`/api/ticket-sets/${id}/raw-test-cases`);
 }
+
+export async function fetchPipelineRunsForTicketSet(id: string) {
+  return requestJson(`/api/ticket-sets/${id}/pipeline-runs`);
+}

@@ -4,6 +4,7 @@ import {
   BAList,
   BuildingBlock,
   DerivedTestCase,
+  PipelineRun,
   RawTestCase,
   TicketSet,
 } from "../models";
@@ -32,6 +33,7 @@ async function initializeCollections(): Promise<void> {
     BAList.createCollection(),
     BuildingBlock.createCollection(),
     DerivedTestCase.createCollection(),
+    PipelineRun.createCollection(),
     RawTestCase.createCollection(),
     TicketSet.createCollection(),
   ]);
@@ -40,6 +42,7 @@ async function initializeCollections(): Promise<void> {
     BAList.syncIndexes(),
     BuildingBlock.syncIndexes(),
     DerivedTestCase.syncIndexes(),
+    PipelineRun.syncIndexes(),
     RawTestCase.syncIndexes(),
     TicketSet.syncIndexes(),
   ]);
