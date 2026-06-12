@@ -1,0 +1,50 @@
+"""Task-specific prompt text for one test-case evaluation."""
+
+EVALUATION_PROMPT_TEMPLATE = """Evaluate the provided derived test case against the supplied BA and Building Block evidence.
+
+Evaluate two independent axes:
+
+1. Frame conformance
+- Determine whether the test case belongs to one Building Block.
+- If no Building Block matches, mark the route as not found.
+- If a Building Block matches, compare the test case steps against the canonical Building Block steps.
+- The test case must contain all canonical Building Block steps.
+- Extra test case steps are allowed.
+- Matching is semantic and evidence-based, not strict row-by-row position matching.
+
+2. Requirement currency
+- Use the test case result_code to find the latest BA rule.
+- Compare the test case evidence against the latest BA rule.
+- Use historical BA rows only as context for explaining staleness.
+- Steps and expected results are stronger evidence than title wording.
+- Check action labels, exception colour, auto hold-up, profiler applicability, profiler abort support, validity, and deprecated/obsolete status.
+
+Use any user prompt only as clarification of terminology. Do not let it override BA or Building Block truth.
+
+Required JSON response shape:
+{
+  "building_block": {
+    "matched": true,
+    "building_block_id": "",
+    "block_id": "",
+    "title": "",
+    "version": "",
+    "explanation": ""
+  },
+  "frame": {
+    "passed": true,
+    "missing_steps": [],
+    "explanation": ""
+  },
+  "currency": {
+    "passed": true,
+    "ba_rule_id": "",
+    "ba_version_used": "",
+    "explanation": ""
+  }
+}
+"""
+
+
+def get_evaluation_prompt() -> str:
+    return EVALUATION_PROMPT_TEMPLATE.strip()
