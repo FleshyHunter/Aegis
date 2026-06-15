@@ -17,6 +17,7 @@ def build_dify_payload(
     ticket: dict[str, Any],
     ba_context: dict[str, Any],
     building_blocks: list[dict[str, Any]],
+    project_context_text: str = "",
     user_prompt_text: str = "",
     pipeline_run_id: str | None = None,
 ) -> dict[str, Any]:
@@ -31,6 +32,7 @@ def build_dify_payload(
             "system_prompt": get_system_prompt(),
             "evaluation_prompt": get_evaluation_prompt(),
             "pipeline_run_id": pipeline_run_id or "",
+            "project_context_text": project_context_text.strip(),
             "user_prompt_text": user_prompt_text.strip(),
             "ticket": safe_ticket,
             "ba": safe_ba_context,
@@ -73,6 +75,7 @@ def build_dify_payloads_for_tickets(
     normalized_tickets: dict[str, Any],
     normalized_ba: dict[str, Any],
     building_blocks: list[dict[str, Any]],
+    project_context_text: str = "",
     user_prompt_text: str = "",
     pipeline_run_id: str | None = None,
 ) -> list[dict[str, Any]]:
@@ -90,6 +93,7 @@ def build_dify_payloads_for_tickets(
                 result_code=ticket.get("result_code"),
             ),
             building_blocks=building_blocks,
+            project_context_text=project_context_text,
             user_prompt_text=user_prompt_text,
             pipeline_run_id=pipeline_run_id,
         )

@@ -5,6 +5,7 @@ import { connectDB, getDBStatus } from "./database/database";
 import baListRoutes from "./routes/BaList/baList.routes";
 import buildingBlockRoutes from "./routes/BuildingBlock/buildingBlock.routes";
 import pipelineRoutes from "./routes/Pipeline/pipeline.routes";
+import projectContextRoutes from "./routes/ProjectContext/projectContext.routes";
 import ticketSetRoutes from "./routes/TicketSet/ticketSet.routes";
 
 const app = express();
@@ -25,6 +26,7 @@ app.get("/health", (_req, res) => {
 app.use("/api", pipelineRoutes);
 app.use("/api", baListRoutes);
 app.use("/api", buildingBlockRoutes);
+app.use("/api", projectContextRoutes);
 app.use("/api", ticketSetRoutes);
 
 async function start(): Promise<void> {

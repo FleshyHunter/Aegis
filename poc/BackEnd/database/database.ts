@@ -5,6 +5,7 @@ import {
   BuildingBlock,
   DerivedTestCase,
   PipelineRun,
+  ProjectContext,
   RawTestCase,
   TicketSet,
 } from "../models";
@@ -34,6 +35,7 @@ async function initializeCollections(): Promise<void> {
     BuildingBlock.createCollection(),
     DerivedTestCase.createCollection(),
     PipelineRun.createCollection(),
+    ProjectContext.createCollection(),
     RawTestCase.createCollection(),
     TicketSet.createCollection(),
   ]);
@@ -43,6 +45,7 @@ async function initializeCollections(): Promise<void> {
     BuildingBlock.syncIndexes(),
     DerivedTestCase.syncIndexes(),
     PipelineRun.syncIndexes(),
+    ProjectContext.syncIndexes(),
     RawTestCase.syncIndexes(),
     TicketSet.syncIndexes(),
   ]);

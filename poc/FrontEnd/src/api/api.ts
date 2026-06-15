@@ -112,3 +112,24 @@ export async function fetchRawTestCasesForTicketSet(id: string) {
 export async function fetchPipelineRunsForTicketSet(id: string) {
   return requestJson(`/api/ticket-sets/${id}/pipeline-runs`);
 }
+
+export async function fetchProjectContexts() {
+  return requestJson("/api/project-contexts");
+}
+
+export async function fetchProjectContextById(id: string) {
+  return requestJson(`/api/project-contexts/${id}`);
+}
+
+export async function createProjectContext(input: {
+  name: string;
+  description: string;
+  context_text: string;
+  is_default: boolean;
+}) {
+  return requestJson("/api/project-contexts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+}

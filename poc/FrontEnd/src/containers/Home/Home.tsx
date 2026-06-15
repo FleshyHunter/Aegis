@@ -71,6 +71,7 @@ export default function Home() {
         />
 
         <div className="home-nav-buttons">
+          <Button label="Project Context" variant="secondary" onClick={() => navigate("/project-contexts")} />
           <Button label="BA Rules" variant="secondary" onClick={() => navigate("/ba")} />
           <Button label="Building Blocks" variant="secondary" onClick={() => navigate("/building-blocks")} />
           <Button label="Ticket Sets" variant="secondary" onClick={() => navigate("/ticket-sets")} />
@@ -85,6 +86,14 @@ export default function Home() {
         <div className="home-feature-cards">
           <FeatureCard
             index={0}
+            to="/project-contexts"
+            title="Project Context"
+            description="Maintain reusable project background for pipeline runs. Store domain notes, naming
+             conventions, release assumptions, and reviewer guidance separately from one-off run prompts so each
+              evaluation can later snapshot the exact context it used."
+          />
+          <FeatureCard
+            index={1}
             to="/ba"
             title="BA Rules"
             description="Import and manage BA rule sets. Each CSV defines the expected system behaviour for every
@@ -92,7 +101,7 @@ export default function Home() {
               any exception rule and cross-reference it against your test cases to catch outdated or inconsistent entries."
           />
           <FeatureCard
-            index={1}
+            index={2}
             to="/building-blocks"
             title="Building Blocks"
             description="Import and organise building block sets. A building block defines the standard structure
@@ -101,7 +110,7 @@ export default function Home() {
                checker to flag any test case that deviates from the expected flow of its group."
           />
           <FeatureCard
-            index={2}
+            index={3}
             to="/ticket-sets"
             title="Ticket Sets"
             description="A history of all pipeline runs. Each entry captures the validation results for a ticket
@@ -109,7 +118,7 @@ export default function Home() {
               past runs, compare results across versions, and identify test cases that need attention."
           />
           <FeatureCard
-            index={3}
+            index={4}
             to="/tickets"
             title="Tickets"
             description="Import Jira test case exports, select your BA rule set and Building Block inputs, and run

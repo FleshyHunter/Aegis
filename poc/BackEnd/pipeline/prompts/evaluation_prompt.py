@@ -17,9 +17,9 @@ Evaluate two independent axes:
 - Compare the test case evidence against the latest BA rule.
 - Use historical BA rows only as context for explaining staleness.
 - Steps and expected results are stronger evidence than title wording.
-- Check action labels, exception colour, auto hold-up, profiler applicability, profiler abort support, validity, and deprecated/obsolete status.
+- Check BA fields that define current expected behaviour, including action labels, status/display values, automation flags, notification requirements, permission flags, validity, and deprecated/obsolete status.
 
-Use any user prompt only as clarification of terminology. Do not let it override BA or Building Block truth.
+Use project context only as reusable domain background. Use any user prompt only as run-specific clarification. Do not let either override BA or Building Block truth.
 
 Required JSON response shape:
 {

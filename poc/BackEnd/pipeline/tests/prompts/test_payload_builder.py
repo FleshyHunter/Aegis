@@ -12,7 +12,8 @@ class TestPayloadBuilder(unittest.TestCase):
     def test_build_dify_payload_contains_prompt_and_normalized_context(self):
         payload = build_dify_payload(
             pipeline_run_id="run-1",
-            user_prompt_text=" Treat spoof flagging as Flag Spoof Attempt. ",
+            project_context_text=" Stable product context. ",
+            user_prompt_text=" Treat flagging as escalation. ",
             ticket={
                 "jira_ticket_id": "JT-0001",
                 "result_code": "IR01",
@@ -37,8 +38,12 @@ class TestPayloadBuilder(unittest.TestCase):
         self.assertEqual(payload["user"], "aegis-poc")
         self.assertEqual(payload["inputs"]["pipeline_run_id"], "run-1")
         self.assertEqual(
+            payload["inputs"]["project_context_text"],
+            "Stable product context.",
+        )
+        self.assertEqual(
             payload["inputs"]["user_prompt_text"],
-            "Treat spoof flagging as Flag Spoof Attempt.",
+            "Treat flagging as escalation.",
         )
         self.assertIn("system_prompt", payload["inputs"])
         self.assertIn("evaluation_prompt", payload["inputs"])
@@ -112,6 +117,7 @@ class TestPayloadBuilder(unittest.TestCase):
     def test_build_dify_payloads_for_tickets_builds_one_payload_per_ticket(self):
         payloads = build_dify_payloads_for_tickets(
             pipeline_run_id="run-1",
+            project_context_text="Stable product context.",
             user_prompt_text="Use project-specific synonym.",
             normalized_tickets={
                 "tickets": [
@@ -127,6 +133,7 @@ class TestPayloadBuilder(unittest.TestCase):
         )
 
         self.assertEqual(len(payloads), 2)
+        self.assertEqual(payloads[0]["inputs"]["project_context_text"], "Stable product context.")
         self.assertEqual(payloads[0]["inputs"]["ticket"]["jira_ticket_id"], "JT-0001")
         self.assertEqual(payloads[1]["inputs"]["ticket"]["jira_ticket_id"], "JT-0002")
 

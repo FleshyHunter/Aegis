@@ -2,6 +2,8 @@ import { createBrowserRouter } from "react-router-dom";
 import Home from "./containers/Home/Home";
 import BAList from "./containers/BAList/BAList";
 import BAEntry from "./containers/BAList/BAEntry";
+import ProjectContexts from "./containers/ProjectContexts/ProjectContexts";
+import ProjectContextEntry from "./containers/ProjectContexts/ProjectContextEntry";
 import BuildingBlocks from "./containers/BuildingBlocks/BuildingBlocks";
 import BuildingBlockEntry from "./containers/BuildingBlocks/BuildingBlockEntry";
 import TicketList from "./containers/TicketList/TicketList";
@@ -20,6 +22,14 @@ const router = createBrowserRouter([
   {
     path: "/ba",
     element: <BAList />,
+  },
+  {
+    path: "/project-contexts",
+    element: <ProjectContexts />,
+  },
+  {
+    path: "/project-contexts/:id",
+    element: <ProjectContextEntry />,
   },
   {
     path: "/ba/:id",
