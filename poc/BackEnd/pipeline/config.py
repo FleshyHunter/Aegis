@@ -25,16 +25,28 @@ class DifyConfig:
     user: str = DEFAULT_DIFY_USER
 
     @classmethod
-    def from_env(cls) -> "DifyConfig":
+    def from_env(
+        cls,
+        *,
+        api_key_env: str = "DIFY_API_KEY",
+        fallback_api_key_env: str = "LLM_API_KEY",
+    ) -> "DifyConfig":
         base_url = (
             os.getenv("DIFY_BASE_URL")
             or os.getenv("LLM_BASE_URL")
             or DEFAULT_DIFY_BASE_URL
         ).strip()
-        api_key = (os.getenv("DIFY_API_KEY") or os.getenv("LLM_API_KEY") or "").strip()
+        api_key = (
+            os.getenv(api_key_env)
+            or os.getenv("DIFY_API_KEY")
+            or os.getenv(fallback_api_key_env)
+            or ""
+        ).strip()
 
         if not api_key:
-            raise PipelineConfigError("Missing DIFY_API_KEY or LLM_API_KEY environment variable.")
+            raise PipelineConfigError(
+                f"Missing {api_key_env}, DIFY_API_KEY, or {fallback_api_key_env} environment variable."
+            )
 
         timeout_seconds = _read_int_env(
             "DIFY_TIMEOUT_SECONDS",
