@@ -1,3 +1,5 @@
+name: aegis
+
 services:
 
   mongo:
@@ -14,7 +16,7 @@ services:
   api:
     build:
       context: ./poc/BackEnd
-      dockerfile: Dockerfile.node
+      dockerfile: docker/Dockerfile.node
     container_name: aegis-api
     restart: unless-stopped
     ports:
@@ -31,7 +33,7 @@ services:
   poc-runner:
     build:
       context: ./poc/BackEnd
-      dockerfile: Dockerfile.python
+      dockerfile: docker/Dockerfile.python
     container_name: aegis-poc-runner
     environment:
       USE_MOCK_LLM: "true"

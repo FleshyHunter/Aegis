@@ -36,3 +36,6 @@ Thumbs.db
 
 # LLM
 .claude/
+
+# Misc
+./logos
