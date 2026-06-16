@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from pipeline.prompts.evaluation_payload_builder import build_evaluation_payload
+from pipeline.payloads.evaluation_payload_builder import build_evaluation_payload
 
 
 class TestEvaluationPayloadBuilder(unittest.TestCase):

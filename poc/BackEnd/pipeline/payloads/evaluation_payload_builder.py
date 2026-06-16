@@ -2,12 +2,9 @@
 
 from __future__ import annotations
 
-import copy
-import json
 from typing import Any
 
-
-FORBIDDEN_KEYS = {"label_hint"}
+from .payload_utils import build_dify_envelope, json_for_dify, strip_forbidden_keys
 
 
 EVALUATION_SYSTEM_PROMPT = """You are AEGIS, a QA test-case governance evaluator.
@@ -149,12 +146,12 @@ def build_evaluation_payload(
     """Build a string-input Dify payload for Phase 2 evaluation."""
 
     run_id = pipeline_run_id or ""
-    safe_ticket = _strip_forbidden_keys(ticket)
-    safe_ba_context = _strip_forbidden_keys(ba_context)
-    safe_building_block = _strip_forbidden_keys(building_block)
-    ticket_json = _json_for_dify(safe_ticket)
-    ba_context_json = _json_for_dify(safe_ba_context)
-    building_block_json = _json_for_dify(safe_building_block)
+    safe_ticket = strip_forbidden_keys(ticket)
+    safe_ba_context = strip_forbidden_keys(ba_context)
+    safe_building_block = strip_forbidden_keys(building_block)
+    ticket_json = json_for_dify(safe_ticket)
+    ba_context_json = json_for_dify(safe_ba_context)
+    building_block_json = json_for_dify(safe_building_block)
     prompt = EVALUATION_PROMPT_TEMPLATE.format(
         pipeline_run_id=run_id,
         ticket_json=ticket_json,
@@ -164,8 +161,8 @@ def build_evaluation_payload(
         user_prompt_text=user_prompt_text.strip(),
     )
 
-    return {
-        "inputs": {
+    return build_dify_envelope(
+        inputs={
             "system_prompt": EVALUATION_SYSTEM_PROMPT.strip(),
             "evaluation_prompt": prompt.strip(),
             "pipeline_run_id": run_id,
@@ -174,35 +171,5 @@ def build_evaluation_payload(
             "building_block_json": building_block_json,
             "project_context_text": project_context_text.strip(),
             "user_prompt_text": user_prompt_text.strip(),
-        },
-        "response_mode": "blocking",
-        "user": "aegis-poc",
-    }
-
-
-def _json_for_dify(value: Any) -> str:
-    return json.dumps(
-        _strip_forbidden_keys(value),
-        ensure_ascii=True,
-        sort_keys=True,
-        separators=(",", ":"),
-    )
-
-
-def _strip_forbidden_keys(value: Any) -> Any:
-    copied = copy.deepcopy(value)
-    return _remove_keys(copied, FORBIDDEN_KEYS)
-
-
-def _remove_keys(value: Any, forbidden_keys: set[str]) -> Any:
-    if isinstance(value, dict):
-        return {
-            key: _remove_keys(item, forbidden_keys)
-            for key, item in value.items()
-            if key not in forbidden_keys
         }
-
-    if isinstance(value, list):
-        return [_remove_keys(item, forbidden_keys) for item in value]
-
-    return value
+    )

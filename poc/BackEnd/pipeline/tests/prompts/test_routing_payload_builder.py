@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from pipeline.prompts.routing_payload_builder import (
+from pipeline.payloads.routing_payload_builder import (
     build_compact_building_blocks,
     build_routing_payload,
     build_routing_ticket_context,
