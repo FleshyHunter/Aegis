@@ -53,7 +53,6 @@ export async function createProjectContextController(
       name: req.body.name,
       description: req.body.description,
       context_text: req.body.context_text,
-      is_default: req.body.is_default,
     });
 
     res.status(201).json(toProjectContextResponse(entry));
@@ -78,7 +77,6 @@ export async function updateProjectContextController(
       name: req.body.name,
       description: req.body.description,
       context_text: req.body.context_text,
-      is_default: req.body.is_default,
     });
 
     if (!updated) {
@@ -122,10 +120,6 @@ function validateProjectContextBody(body: Record<string, unknown>, requireAll: b
   if (body.context_text !== undefined && !isNonEmptyString(body.context_text)) {
     return "context_text must be a non-empty string.";
   }
-  if (body.is_default !== undefined && typeof body.is_default !== "boolean") {
-    return "is_default must be a boolean.";
-  }
-
   return null;
 }
 
@@ -138,7 +132,6 @@ function toProjectContextResponse(entry: {
   name: string;
   description: string;
   context_text: string;
-  is_default: boolean;
   created_at: Date;
   updated_at: Date;
 }) {
@@ -147,7 +140,6 @@ function toProjectContextResponse(entry: {
     name: entry.name,
     description: entry.description,
     context_text: entry.context_text,
-    is_default: entry.is_default,
     created_at: entry.created_at,
     updated_at: entry.updated_at,
   };

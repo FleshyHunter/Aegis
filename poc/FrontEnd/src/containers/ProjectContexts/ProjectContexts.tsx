@@ -3,16 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { BsEye, BsPencil, BsTrash } from "react-icons/bs";
 import Navbar from "../../components/Layout/Navbar";
 import Button from "../../components/Button/Button";
+import { usePopup } from "../../components/PopUp/PopupContext";
 import { usePagination } from "../../components/Pagination/usePagination";
 import Pagination from "../../components/Pagination/Pagination";
-import { createProjectContext, fetchProjectContexts } from "../../api/api";
+import { createProjectContext, deleteProjectContext, fetchProjectContexts } from "../../api/api";
 import "./ProjectContexts.css";
 
 export interface ProjectContextSummary {
   id: string;
   name: string;
   description: string;
-  is_default: boolean;
   context_text: string;
   created_at: string;
   updated_at: string;
@@ -20,6 +20,7 @@ export interface ProjectContextSummary {
 
 export default function ProjectContexts() {
   const navigate = useNavigate();
+  const { confirm } = usePopup();
   const [search, setSearch] = useState("");
   const [entries, setEntries] = useState<ProjectContextSummary[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -36,14 +37,25 @@ export default function ProjectContexts() {
   async function handleCreate(input: ProjectContextFormValues) {
     setError(null);
     const created = await createProjectContext(input);
-    setEntries((prev) => {
-      const nextEntries = input.is_default
-        ? prev.map((entry) => ({ ...entry, is_default: false }))
-        : prev;
-
-      return [created, ...nextEntries];
-    });
+    setEntries((prev) => [created, ...prev]);
     setShowCreateModal(false);
+  }
+
+  async function handleDelete(id: string) {
+    const ok = await confirm({
+      title: "Delete project context",
+      message: "Are you sure you want to delete this project context? This cannot be undone.",
+      confirmText: "Delete",
+      variant: "danger",
+    });
+    if (!ok) return;
+
+    try {
+      await deleteProjectContext(id);
+      setEntries((prev) => prev.filter((entry) => entry.id !== id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Delete failed.");
+    }
   }
 
   const filteredEntries = useMemo(
@@ -113,7 +125,11 @@ export default function ProjectContexts() {
                       <button className="pc-icon-btn" title="Edit name" disabled>
                         <BsPencil />
                       </button>
-                      <button className="pc-icon-btn pc-icon-danger" title="Delete" disabled>
+                      <button
+                        className="pc-icon-btn pc-icon-danger"
+                        title="Delete"
+                        onClick={() => handleDelete(entry.id)}
+                      >
                         <BsTrash />
                       </button>
                     </div>
@@ -148,7 +164,6 @@ interface ProjectContextFormValues {
   name: string;
   description: string;
   context_text: string;
-  is_default: boolean;
 }
 
 interface ProjectContextFormModalProps {
@@ -160,7 +175,6 @@ function ProjectContextFormModal({ onCancel, onSubmit }: ProjectContextFormModal
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [contextText, setContextText] = useState("");
-  const [isDefault, setIsDefault] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -185,7 +199,6 @@ function ProjectContextFormModal({ onCancel, onSubmit }: ProjectContextFormModal
         name: name.trim(),
         description: description.trim(),
         context_text: contextText.trim(),
-        is_default: isDefault,
       });
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "Failed to create project context.");
@@ -224,15 +237,6 @@ function ProjectContextFormModal({ onCancel, onSubmit }: ProjectContextFormModal
               value={contextText}
               onChange={(e) => setContextText(e.target.value)}
             />
-          </label>
-
-          <label className="pc-default-toggle">
-            <input
-              type="checkbox"
-              checked={isDefault}
-              onChange={(e) => setIsDefault(e.target.checked)}
-            />
-            <span>Set as default</span>
           </label>
 
           {formError && <p className="pc-form-error">{formError}</p>}

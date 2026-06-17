@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { startPipeline } from "../../services/Pipeline/pipeline.service";
 
 export async function runPipelineController(req: Request, res: Response): Promise<void> {
-  const { ticketSetId, baListId, buildingBlockIds, userPrompt } = req.body;
+  const { ticketSetId, baListId, buildingBlockIds, userPrompt, projectContext } = req.body;
 
   if (!ticketSetId || typeof ticketSetId !== "string") {
     res.status(400).json({ error: "ticketSetId is required." });
@@ -19,12 +19,18 @@ export async function runPipelineController(req: Request, res: Response): Promis
     return;
   }
 
+  if (projectContext !== undefined && !isProjectContextInput(projectContext)) {
+    res.status(400).json({ error: "projectContext must include string id, name, and contextText when provided." });
+    return;
+  }
+
   try {
     const result = await startPipeline({
       ticketSetId,
       baListId,
       buildingBlockIds: buildingBlockIds ?? [],
       userPrompt: typeof userPrompt === "string" ? userPrompt : "",
+      projectContext,
     });
 
     res.json({
@@ -33,6 +39,7 @@ export async function runPipelineController(req: Request, res: Response): Promis
       ticketSetId,
       baListId,
       buildingBlockIds: buildingBlockIds ?? [],
+      projectContext: projectContext ?? null,
       pipelineOutput: result.stdout,
     });
   } catch (err) {
@@ -42,4 +49,19 @@ export async function runPipelineController(req: Request, res: Response): Promis
       detail: err instanceof Error ? err.message : "Unknown error.",
     });
   }
+}
+
+function isProjectContextInput(value: unknown): value is {
+  id?: string;
+  name?: string;
+  contextText?: string;
+} {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+
+  const context = value as Record<string, unknown>;
+  return (
+    (context.id === undefined || typeof context.id === "string") &&
+    (context.name === undefined || typeof context.name === "string") &&
+    (context.contextText === undefined || typeof context.contextText === "string")
+  );
 }

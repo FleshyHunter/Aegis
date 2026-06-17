@@ -8,6 +8,9 @@ export interface IPipelineRun extends Document {
   ba_rule_scope: string;
   building_block_ids: Types.ObjectId[];
   user_prompt_text: string;
+  project_context_id?: Types.ObjectId | null;
+  project_context_name: string;
+  project_context_text_snapshot: string;
   evaluator_version: string;
   llm_provider: string;
   llm_model: string;
@@ -28,6 +31,22 @@ const PipelineRunSchema = new Schema<IPipelineRun>(
       ref: "TicketSet",
       required: true,
       index: true,
+    },
+    
+    project_context_id: {
+      type: Schema.Types.ObjectId,
+      ref: "ProjectContext",
+      default: null,
+      index: true,
+    },
+    project_context_name: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    project_context_text_snapshot: {
+      type: String,
+      default: "",
     },
     ba_list_id: {
       type: Schema.Types.ObjectId,

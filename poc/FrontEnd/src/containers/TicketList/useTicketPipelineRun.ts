@@ -78,13 +78,14 @@ export function useTicketPipelineRun({
       );
       setSelectedBuildingBlocks(uploadedBuildingBlocks);
 
+      let effectiveProjectContext = selectedProjectContext;
       if (selectedProjectContext?.isNew) {
         const createdContext = await createProjectContext({
           name: selectedProjectContext.name,
           description: selectedProjectContext.description,
           context_text: selectedProjectContext.context_text,
-          is_default: false,
         });
+        effectiveProjectContext = createdContext;
         setSelectedProjectContext(createdContext);
       }
 
@@ -99,6 +100,13 @@ export function useTicketPipelineRun({
         baListId,
         buildingBlockIds: uploadedBuildingBlocks.map((entry) => entry.id),
         userPrompt,
+        projectContext: effectiveProjectContext
+          ? {
+              id: effectiveProjectContext.id,
+              name: effectiveProjectContext.name,
+              contextText: effectiveProjectContext.context_text,
+            }
+          : undefined,
       });
 
       setRunMessage("Pipeline started. Derived test cases are available in Ticket Sets.");

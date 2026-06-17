@@ -11,6 +11,9 @@ interface CreatePipelineRunInput {
   baListId: string;
   buildingBlockIds: string[];
   userPrompt: string;
+  projectContextId?: string;
+  projectContextName?: string;
+  projectContextText?: string;
   evaluatorVersion?: string;
   llmProvider?: string;
   llmModel?: string;
@@ -29,6 +32,11 @@ export async function createPipelineRun(
       toObjectId(id, "buildingBlockId")
     ),
     user_prompt_text: input.userPrompt.trim(),
+    project_context_id: input.projectContextId
+      ? toObjectId(input.projectContextId, "projectContextId")
+      : null,
+    project_context_name: input.projectContextName?.trim() ?? "",
+    project_context_text_snapshot: input.projectContextText?.trim() ?? "",
     evaluator_version: input.evaluatorVersion ?? "eval_v1",
     llm_provider: input.llmProvider ?? "Dify",
     llm_model: input.llmModel ?? "",

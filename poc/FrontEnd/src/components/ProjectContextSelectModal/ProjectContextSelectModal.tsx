@@ -9,7 +9,6 @@ export interface ProjectContextSelection {
   name: string;
   description: string;
   context_text: string;
-  is_default: boolean;
   created_at: string;
   updated_at?: string;
   isNew?: boolean;
@@ -61,7 +60,6 @@ export default function ProjectContextSelectModal({
       name: draftName.trim(),
       description: draftDescription.trim(),
       context_text: draftText.trim(),
-      is_default: false,
       created_at: new Date().toISOString(),
       isNew: true,
     });

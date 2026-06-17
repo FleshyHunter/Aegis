@@ -11,6 +11,11 @@ interface StartPipelineInput {
   baListId: string;
   buildingBlockIds?: string[];
   userPrompt?: string;
+  projectContext?: {
+    id?: string;
+    name?: string;
+    contextText?: string;
+  };
 }
 
 interface PipelineStartResult {
@@ -27,6 +32,9 @@ export async function startPipeline(input: StartPipelineInput): Promise<Pipeline
     baListId: input.baListId,
     buildingBlockIds,
     userPrompt: input.userPrompt ?? "",
+    projectContextId: input.projectContext?.id,
+    projectContextName: input.projectContext?.name,
+    projectContextText: input.projectContext?.contextText,
     llmModel: process.env.LLM_MODEL ?? "",
   });
 
@@ -41,6 +49,7 @@ export async function startPipeline(input: StartPipelineInput): Promise<Pipeline
           BA_LIST_ID: input.baListId,
           BUILDING_BLOCK_IDS: buildingBlockIds.join(","),
           USER_PROMPT: input.userPrompt ?? "",
+          PROJECT_CONTEXT_TEXT: input.projectContext?.contextText ?? "",
         },
         cwd: pipelineDir,
       });

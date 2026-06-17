@@ -6,6 +6,11 @@ export async function runPipeline(
     baListId?: string;
     buildingBlockIds?: string[];
     userPrompt?: string;
+    projectContext?: {
+      id?: string;
+      name?: string;
+      contextText?: string;
+    };
   },
 ) {
   const res = await fetch(`${BASE_URL}/api/run`, {
@@ -195,11 +200,16 @@ export async function createProjectContext(input: {
   name: string;
   description: string;
   context_text: string;
-  is_default: boolean;
 }) {
   return requestJson("/api/project-contexts", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
+  });
+}
+
+export async function deleteProjectContext(id: string) {
+  return requestJson(`/api/project-contexts/${id}`, {
+    method: "DELETE",
   });
 }

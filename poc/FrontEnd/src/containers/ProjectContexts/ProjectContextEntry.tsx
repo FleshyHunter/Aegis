@@ -36,10 +36,6 @@ export default function ProjectContextEntry() {
             <dd>{state?.name ?? "Not loaded"}</dd>
           </div>
           <div>
-            <dt>Default Context</dt>
-            <dd>{state?.is_default ? "Yes" : "No"}</dd>
-          </div>
-          <div>
             <dt>Date Added</dt>
             <dd>{state ? new Date(state.created_at).toLocaleString() : "Not loaded"}</dd>
           </div>
