@@ -39,6 +39,34 @@ async function assertOk(res: Response) {
   throw new Error(message);
 }
 
+export interface BAListDetail {
+  id: string;
+  name: string;
+  columns: string[];
+  rows: Record<string, string>[];
+  row_count: number;
+  created_at: string;
+}
+
+export interface BuildingBlockDetail {
+  id: string;
+  name: string;
+  file_name: string;
+  source_type: "docx";
+  mime_type: string;
+  size_bytes: number;
+  preview_text: string;
+  preview_status: "ready" | "unsupported" | "failed";
+  preview_error: string;
+  created_at: string;
+}
+
+export interface EntrySummary {
+  id: string;
+  name: string;
+  created_at: string;
+}
+
 export async function importBAList(name: string, rows: Record<string, string>[]) {
   return requestJson("/api/ba-lists", {
     method: "POST",
@@ -55,12 +83,40 @@ export async function fetchBAListById(id: string) {
   return requestJson(`/api/ba-lists/${id}`);
 }
 
+export async function renameBAList(id: string, name: string) {
+  return requestJson(`/api/ba-lists/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name }),
+  });
+}
+
+export async function deleteBAList(id: string) {
+  return requestJson(`/api/ba-lists/${id}`, {
+    method: "DELETE",
+  });
+}
+
 export async function fetchBuildingBlocks() {
   return requestJson("/api/building-blocks");
 }
 
 export async function fetchBuildingBlockById(id: string) {
   return requestJson(`/api/building-blocks/${id}`);
+}
+
+export async function renameBuildingBlock(id: string, name: string) {
+  return requestJson(`/api/building-blocks/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name }),
+  });
+}
+
+export async function deleteBuildingBlock(id: string) {
+  return requestJson(`/api/building-blocks/${id}`, {
+    method: "DELETE",
+  });
 }
 
 export async function uploadBuildingBlock(file: File) {
@@ -79,6 +135,20 @@ export async function fetchTicketSets() {
 
 export async function fetchTicketSetById(id: string) {
   return requestJson(`/api/ticket-sets/${id}`);
+}
+
+export async function renameTicketSet(id: string, name: string) {
+  return requestJson(`/api/ticket-sets/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name }),
+  });
+}
+
+export async function deleteTicketSet(id: string) {
+  return requestJson(`/api/ticket-sets/${id}`, {
+    method: "DELETE",
+  });
 }
 
 export async function createTicketSet(name: string, rows: Record<string, string>[]) {

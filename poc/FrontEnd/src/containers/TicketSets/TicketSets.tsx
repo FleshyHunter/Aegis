@@ -6,6 +6,7 @@ import { usePopup } from "../../components/PopUp/PopupContext";
 import type { EntrySummary } from "../../components/EntryView/EntrySummary.ts";
 import { usePagination } from "../../components/Pagination/usePagination";
 import Pagination from "../../components/Pagination/Pagination";
+import { deleteTicketSet, fetchTicketSets, renameTicketSet } from "../../api/api";
 import "./TicketSets.css";
 
 export default function TicketSets() {
@@ -16,8 +17,7 @@ export default function TicketSets() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/ticket-sets")
-      .then((r) => r.json())
+    fetchTicketSets()
       .then(setEntries)
       .catch(() => setError("Failed to load ticket sets."));
   }, []);
@@ -31,10 +31,7 @@ export default function TicketSets() {
     });
     if (!ok) return;
     try {
-      const res = await fetch(`http://localhost:3000/api/ticket-sets/${id}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      await deleteTicketSet(id);
       setEntries((prev) => prev.filter((entry) => entry.id !== id));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Delete failed.");
@@ -55,13 +52,7 @@ export default function TicketSets() {
     if (!trimmed || trimmed === entry.name) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/api/ticket-sets/${entry.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: trimmed }),
-      });
-      if (!res.ok) throw new Error(`Server error ${res.status}`);
-      const updated = await res.json();
+      const updated = await renameTicketSet(entry.id, trimmed);
       setEntries((prev) =>
         prev.map((item) => (item.id === entry.id ? { ...item, name: updated.name } : item))
       );

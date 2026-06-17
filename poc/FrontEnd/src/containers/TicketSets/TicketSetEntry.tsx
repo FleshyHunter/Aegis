@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Navbar from "../../components/Layout/Navbar";
-import { fetchRawTestCasesForTicketSet } from "../../api/api";
+import { fetchRawTestCasesForTicketSet, fetchTicketSetById } from "../../api/api";
 import "./TicketSets.css";
 
 interface TicketSetDetail {
@@ -53,11 +53,7 @@ export function TicketSetTableView({ emptyMessage, fetchTable }: TicketSetTableV
     setError(null);
     setTableData(null);
 
-    fetch(`http://localhost:3000/api/ticket-sets/${id}`)
-      .then((r) => {
-        if (!r.ok) throw new Error(`Error ${r.status}`);
-        return r.json();
-      })
+    fetchTicketSetById(id)
       .then((data) => {
         setEntry(data);
       })

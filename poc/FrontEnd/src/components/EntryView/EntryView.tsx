@@ -3,30 +3,18 @@ import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../Layout/Navbar";
 import { usePagination } from "../Pagination/usePagination";
 import Pagination from "../Pagination/Pagination";
+import { fetchBAListById, type BAListDetail } from "../../api/api";
 import "../../containers/BAList/BAList.css";
-
-interface BAEntryDetail {
-  id: string;
-  name: string;
-  columns: string[];
-  rows: Record<string, string>[];
-  row_count: number;
-  created_at: string;
-}
 
 export default function EntryView() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [entry, setEntry] = useState<BAEntryDetail | null>(null);
+  const [entry, setEntry] = useState<BAListDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
-    fetch(`http://localhost:3000/api/ba-lists/${id}`)
-      .then((r) => {
-        if (!r.ok) throw new Error(`Error ${r.status}`);
-        return r.json();
-      })
+    fetchBAListById(id)
       .then((data) => {
         setEntry(data);
         pagination.reset();

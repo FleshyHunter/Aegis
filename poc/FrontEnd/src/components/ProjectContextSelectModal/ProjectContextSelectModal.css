@@ -1,0 +1,43 @@
+.pcsm-box {
+  max-width: 560px;
+}
+
+.pcsm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pcsm-textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.pcsm-textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.pcsm-textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.pcsm-entry-selected {
+  border-color: var(--color-accent);
+}
+
+.pcsm-pending-label {
+  color: var(--color-text-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}

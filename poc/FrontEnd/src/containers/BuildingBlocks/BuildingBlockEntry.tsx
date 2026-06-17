@@ -1,20 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../../components/Layout/Navbar";
+import { fetchBuildingBlockById, type BuildingBlockDetail } from "../../api/api";
 import "./BuildingBlocks.css";
-
-interface BuildingBlockDetail {
-  id: string;
-  name: string;
-  file_name: string;
-  source_type: "docx";
-  mime_type: string;
-  size_bytes: number;
-  preview_text: string;
-  preview_status: "ready" | "unsupported" | "failed";
-  preview_error: string;
-  created_at: string;
-}
 
 export default function BuildingBlockEntry() {
   const { id } = useParams<{ id: string }>();
@@ -24,11 +12,7 @@ export default function BuildingBlockEntry() {
 
   useEffect(() => {
     if (!id) return;
-    fetch(`http://localhost:3000/api/building-blocks/${id}`)
-      .then((r) => {
-        if (!r.ok) throw new Error(`Error ${r.status}`);
-        return r.json();
-      })
+    fetchBuildingBlockById(id)
       .then((data) => {
         setEntry(data);
       })

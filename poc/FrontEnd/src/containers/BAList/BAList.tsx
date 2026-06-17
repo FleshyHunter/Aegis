@@ -5,6 +5,7 @@ import Navbar from "../../components/Layout/Navbar";
 import { usePopup } from "../../components/PopUp/PopupContext";
 import { usePagination } from "../../components/Pagination/usePagination";
 import Pagination from "../../components/Pagination/Pagination";
+import { deleteBAList, fetchBALists, importBAList, renameBAList } from "../../api/api";
 import { parseCSV } from "../../utils/csv";
 import "./BAList.css";
 
@@ -24,8 +25,7 @@ export default function BAList() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/ba-lists")
-      .then((r) => r.json())
+    fetchBALists()
       .then(setEntries)
       .catch(() => setError("Failed to load BA lists."));
   }, []);
@@ -38,13 +38,7 @@ export default function BAList() {
     try {
       const text = await file.text();
       const rows = parseCSV(text);
-      const res = await fetch("http://localhost:3000/api/ba-lists", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: file.name, rows }),
-      });
-      if (!res.ok) throw new Error(`Server error ${res.status}`);
-      const saved = await res.json();
+      const saved = await importBAList(file.name, rows);
       setEntries((prev) => [saved, ...prev]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Import failed.");
@@ -63,10 +57,7 @@ export default function BAList() {
     });
     if (!ok) return;
     try {
-      const res = await fetch(`http://localhost:3000/api/ba-lists/${id}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      await deleteBAList(id);
       setEntries((prev) => prev.filter((entry) => entry.id !== id));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Delete failed.");
@@ -87,13 +78,7 @@ export default function BAList() {
     if (!trimmed || trimmed === entry.name) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/api/ba-lists/${entry.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: trimmed }),
-      });
-      if (!res.ok) throw new Error(`Server error ${res.status}`);
-      const updated = await res.json();
+      const updated = await renameBAList(entry.id, trimmed);
       setEntries((prev) =>
         prev.map((item) => (item.id === entry.id ? { ...item, name: updated.name } : item))
       );

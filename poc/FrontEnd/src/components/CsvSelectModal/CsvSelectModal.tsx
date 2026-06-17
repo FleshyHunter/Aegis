@@ -15,8 +15,8 @@ interface EntrySummary {
 
 interface Props {
   title: string;
-  fetchUrl: string;
-  detailUrl: string;
+  fetchEntries: () => Promise<EntrySummary[]>;
+  fetchEntryById: (id: string) => Promise<{ rows: Row[] }>;
   selectedName?: string | null;
   onSelect: (name: string, rows: Row[], isNew: boolean, id?: string) => void;
   onClearSelected?: () => void;
@@ -25,8 +25,8 @@ interface Props {
 
 export default function CsvSelectModal({
   title,
-  fetchUrl,
-  detailUrl,
+  fetchEntries,
+  fetchEntryById,
   selectedName,
   onSelect,
   onClearSelected,
@@ -40,15 +40,11 @@ export default function CsvSelectModal({
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    fetch(fetchUrl)
-      .then((r) => {
-        if (!r.ok) throw new Error(`Error ${r.status}`);
-        return r.json();
-      })
+    fetchEntries()
       .then(setEntries)
       .catch(() => setError("Failed to load existing entries."))
       .finally(() => setLoadingList(false));
-  }, [fetchUrl]);
+  }, [fetchEntries]);
 
   async function handleFileUpload(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -62,9 +58,7 @@ export default function CsvSelectModal({
     setLoadingEntry(entry.id);
     setError(null);
     try {
-      const res = await fetch(`${detailUrl}/${entry.id}`);
-      if (!res.ok) throw new Error(`Error ${res.status}`);
-      const data = await res.json();
+      const data = await fetchEntryById(entry.id);
       onSelect(entry.name, data.rows, false, entry.id);
     } catch {
       setError("Failed to load entry. Please try again.");

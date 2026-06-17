@@ -2,7 +2,12 @@ import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { BsEye, BsPencil, BsTrash } from "react-icons/bs";
 import Navbar from "../../components/Layout/Navbar";
-import { fetchBuildingBlocks, uploadBuildingBlock } from "../../api/api";
+import {
+  deleteBuildingBlock,
+  fetchBuildingBlocks,
+  renameBuildingBlock,
+  uploadBuildingBlock,
+} from "../../api/api";
 import { usePopup } from "../../components/PopUp/PopupContext";
 import type { EntrySummary } from "../../components/EntryView/EntrySummary.ts";
 import { usePagination } from "../../components/Pagination/usePagination";
@@ -49,10 +54,7 @@ export default function BuildingBlocks() {
     });
     if (!ok) return;
     try {
-      const res = await fetch(`http://localhost:3000/api/building-blocks/${id}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      await deleteBuildingBlock(id);
       setEntries((prev) => prev.filter((entry) => entry.id !== id));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Delete failed.");
@@ -73,13 +75,7 @@ export default function BuildingBlocks() {
     if (!trimmed || trimmed === entry.name) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/api/building-blocks/${entry.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: trimmed }),
-      });
-      if (!res.ok) throw new Error(`Server error ${res.status}`);
-      const updated = await res.json();
+      const updated = await renameBuildingBlock(entry.id, trimmed);
       setEntries((prev) =>
         prev.map((item) => (item.id === entry.id ? { ...item, name: updated.name } : item))
       );

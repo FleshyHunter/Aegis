@@ -1,30 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../../components/Layout/Navbar";
+import { fetchBAListById, type BAListDetail } from "../../api/api";
 import "./BAList.css";
-
-interface BAEntryDetail {
-  id: string;
-  name: string;
-  columns: string[];
-  rows: Record<string, string>[];
-  row_count: number;
-  created_at: string;
-}
 
 export default function BAEntry() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [entry, setEntry] = useState<BAEntryDetail | null>(null);
+  const [entry, setEntry] = useState<BAListDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
-    fetch(`http://localhost:3000/api/ba-lists/${id}`)
-      .then((r) => {
-        if (!r.ok) throw new Error(`Error ${r.status}`);
-        return r.json();
-      })
+    fetchBAListById(id)
       .then(setEntry)
       .catch((err) => setError(err.message));
   }, [id]);
