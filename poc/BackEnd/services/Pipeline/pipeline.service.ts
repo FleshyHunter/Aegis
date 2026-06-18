@@ -1,6 +1,8 @@
 import { spawn } from "child_process";
 import * as path from "path";
 import type { IPipelineRun } from "../../models/PipelineRun/PipelineRun";
+import { getBAListById } from "../BaList/baList.service";
+import { getBuildingBlockById } from "../BuildingBlock/buildingBlock.service";
 import {
   createPipelineRun,
   updatePipelineRunStatus,
@@ -9,6 +11,7 @@ import {
 interface StartPipelineInput {
   ticketSetId: string;
   baListId: string;
+  
   buildingBlockIds?: string[];
   userPrompt?: string;
   projectContext?: {
@@ -27,10 +30,19 @@ export async function startPipeline(input: StartPipelineInput): Promise<Pipeline
   const pipelineDir = path.resolve(__dirname, "../../pipeline");
   const scriptPath = path.join(pipelineDir, "run_pipeline.py");
   const buildingBlockIds = input.buildingBlockIds ?? [];
+  const baList = await getBAListById(input.baListId);
+  const buildingBlocks = await Promise.all(
+    buildingBlockIds.map((id) => getBuildingBlockById(id))
+  );
+
   const pipelineRun = await createPipelineRun({
     ticketSetId: input.ticketSetId,
     baListId: input.baListId,
+    baListName: baList?.name ?? "",
     buildingBlockIds,
+    buildingBlockName: buildingBlocks
+      .map((block) => block?.name ?? "")
+      .filter(Boolean),
     userPrompt: input.userPrompt ?? "",
     projectContextId: input.projectContext?.id,
     projectContextName: input.projectContext?.name,

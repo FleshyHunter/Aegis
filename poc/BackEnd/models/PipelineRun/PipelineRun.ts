@@ -5,8 +5,10 @@ export type PipelineRunStatus = "started" | "completed" | "failed";
 export interface IPipelineRun extends Document {
   ticket_set_id: Types.ObjectId;
   ba_list_id: Types.ObjectId;
+  ba_list_name: string;
   ba_rule_scope: string;
   building_block_ids: Types.ObjectId[];
+  building_block_names: string[];
   user_prompt_text: string;
   project_context_id?: Types.ObjectId | null;
   project_context_name: string;
@@ -54,6 +56,11 @@ const PipelineRunSchema = new Schema<IPipelineRun>(
       required: true,
       index: true,
     },
+    ba_list_name: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     ba_rule_scope: {
       type: String,
       default: "latest_by_result_code",
@@ -62,6 +69,11 @@ const PipelineRunSchema = new Schema<IPipelineRun>(
       type: [Schema.Types.ObjectId],
       ref: "BuildingBlock",
       default: [],
+    },
+    building_block_names: {
+      type: [String],
+      default: [],
+      trim: true,
     },
     user_prompt_text: {
       type: String,

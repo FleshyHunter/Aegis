@@ -9,7 +9,9 @@ import { getDerivedTestCaseTableByTicketSetId } from "../DerivedTestCase/derived
 interface CreatePipelineRunInput {
   ticketSetId: string;
   baListId: string;
+  baListName: string;
   buildingBlockIds: string[];
+  buildingBlockName: string[];
   userPrompt: string;
   projectContextId?: string;
   projectContextName?: string;
@@ -27,9 +29,13 @@ export async function createPipelineRun(
   return PipelineRun.create({
     ticket_set_id: toObjectId(input.ticketSetId, "ticketSetId"),
     ba_list_id: toObjectId(input.baListId, "baListId"),
+    ba_list_name: input.baListName.trim(),
     ba_rule_scope: "latest_by_result_code",
     building_block_ids: input.buildingBlockIds.map((id) =>
       toObjectId(id, "buildingBlockId")
+    ),
+    building_block_names: input.buildingBlockName.map((name) =>
+      name.trim()
     ),
     user_prompt_text: input.userPrompt.trim(),
     project_context_id: input.projectContextId
