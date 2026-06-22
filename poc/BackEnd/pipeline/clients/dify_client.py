@@ -63,6 +63,8 @@ class DifyClient:
                 "Accept": "application/json",
                 "Authorization": f"Bearer {self.config.api_key}",
                 "Content-Type": "application/json",
+                # Some hosted API gateways reject urllib's default user agent.
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             },
             method="POST",
         )

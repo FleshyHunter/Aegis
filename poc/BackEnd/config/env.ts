@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 const ENV_PATHS = [
+  path.resolve(__dirname, "../../.env"),
   path.resolve(__dirname, "../../../.env"),
   path.resolve(__dirname, "../.env"),
 ];

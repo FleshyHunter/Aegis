@@ -24,5 +24,11 @@ export type {
 export { PipelineRun } from "./PipelineRun/PipelineRun";
 export type { IPipelineRun, PipelineRunStatus } from "./PipelineRun/PipelineRun";
 
+export { PipelineResult } from "./PipelineResult/PipelineResult";
+export type {
+  IPipelineResult,
+  PipelineFinalClassification,
+} from "./PipelineResult/PipelineResult";
+
 export { ProjectContext } from "./ProjectContext/ProjectContext";
 export type { IProjectContext } from "./ProjectContext/ProjectContext";

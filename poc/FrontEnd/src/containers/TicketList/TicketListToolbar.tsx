@@ -13,7 +13,6 @@ interface TicketListToolbarProps {
   canRun: boolean;
   onRun: () => void;
   runError: string | null;
-  runMessage: string | null;
 }
 
 export default function TicketListToolbar({
@@ -24,7 +23,6 @@ export default function TicketListToolbar({
   canRun,
   onRun,
   runError,
-  runMessage,
 }: TicketListToolbarProps) {
   return (
     <Toolbar
@@ -54,7 +52,6 @@ export default function TicketListToolbar({
             onClick={onRun}
           />
           {runError && <span className="table-error">{runError}</span>}
-          {runMessage && <span className="table-status">{runMessage}</span>}
         </>
       }
     />

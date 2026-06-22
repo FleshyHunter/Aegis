@@ -51,6 +51,14 @@ export function useTicketPipelineRun({
 
   async function handleRun() {
     if (!jiraFileName || !rawRows.length) return;
+    if (!baId && !baIsNew) {
+      setRunError("Please select a BA Rules file before running.");
+      return;
+    }
+    if (!selectedBuildingBlocks.length) {
+      setRunError("Please select at least one Building Block before running.");
+      return;
+    }
 
     setRunning(true);
     setRunError(null);

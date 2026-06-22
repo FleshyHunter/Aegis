@@ -9,9 +9,14 @@
   background-color: var(--color-bg-primary);
 }
 
-.run-context-label {
-  display: block;
+.run-context-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 8px;
+}
+
+.run-context-label {
   color: var(--color-text-secondary);
   font-size: 13px;
   font-weight: 600;

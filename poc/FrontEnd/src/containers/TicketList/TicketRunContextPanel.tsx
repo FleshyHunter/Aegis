@@ -1,17 +1,24 @@
+import CheckCompletedToast from "../../components/CheckCompletedToast/CheckCompletedToast";
+
 interface TicketRunContextPanelProps {
   value: string;
   onChange: (value: string) => void;
+  showCompleted: boolean;
 }
 
 export default function TicketRunContextPanel({
   value,
   onChange,
+  showCompleted,
 }: TicketRunContextPanelProps) {
   return (
     <section className="run-context-panel">
-      <label className="run-context-label" htmlFor="ticket-run-context">
-        Additional Evaluation Context
-      </label>
+      <div className="run-context-header">
+        <label className="run-context-label" htmlFor="ticket-run-context">
+          Additional Evaluation Context
+        </label>
+        <CheckCompletedToast show={showCompleted} />
+      </div>
       <textarea
         id="ticket-run-context"
         className="run-context-textarea"

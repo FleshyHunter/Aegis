@@ -1,9 +1,12 @@
 FROM node:20-alpine
 WORKDIR /app
-RUN apk add --no-cache python3
+RUN apk add --no-cache python3 py3-pip
+COPY requirements.txt /tmp/requirements.txt
+RUN pip3 install --no-cache-dir --break-system-packages -r /tmp/requirements.txt
 COPY package*.json tsconfig.json ./
 RUN npm install
 COPY . .
 RUN npx tsc --outDir dist
+RUN cp -r pipeline dist/
 EXPOSE 3000
 CMD ["node", "dist/server.js"]

@@ -7,6 +7,7 @@ import {
   createPipelineRun,
   updatePipelineRunStatus,
 } from "./pipelineRun.service";
+import { replacePipelineResultsForRun } from "./pipelineResult.service";
 
 interface StartPipelineInput {
   ticketSetId: string;
@@ -24,6 +25,10 @@ interface StartPipelineInput {
 interface PipelineStartResult {
   stdout: string;
   pipelineRun: IPipelineRun;
+}
+
+interface PipelineOutput {
+  results?: unknown;
 }
 
 export async function startPipeline(input: StartPipelineInput): Promise<PipelineStartResult> {
@@ -53,7 +58,8 @@ export async function startPipeline(input: StartPipelineInput): Promise<Pipeline
   try {
     const stdout = await new Promise<string>((resolve, reject) => {
       let output = "";
-      const proc = spawn("python3", [scriptPath], {
+      const pythonBin = process.env.PYTHON_BIN ?? "python3";
+      const proc = spawn(pythonBin, [scriptPath], {
         env: {
           ...process.env,
           PIPELINE_RUN_ID: String(pipelineRun._id),
@@ -79,6 +85,15 @@ export async function startPipeline(input: StartPipelineInput): Promise<Pipeline
       });
     });
 
+    const pipelineOutput = parsePipelineOutput(stdout);
+    await replacePipelineResultsForRun({
+      pipelineRunId: String(pipelineRun._id),
+      ticketSetId: input.ticketSetId,
+      results: Array.isArray(pipelineOutput.results)
+        ? pipelineOutput.results
+        : [],
+    });
+
     const completedRun = await updatePipelineRunStatus(
       String(pipelineRun._id),
       "completed"
@@ -93,5 +108,22 @@ export async function startPipeline(input: StartPipelineInput): Promise<Pipeline
       errorMessage: err instanceof Error ? err.message : "Unknown pipeline error.",
     });
     throw err;
+  }
+}
+
+function parsePipelineOutput(stdout: string): PipelineOutput {
+  try {
+    const parsed = JSON.parse(stdout);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      throw new Error("Pipeline output must be a JSON object.");
+    }
+
+    return parsed as PipelineOutput;
+  } catch (err) {
+    throw new Error(
+      err instanceof Error
+        ? `Failed to parse pipeline output: ${err.message}`
+        : "Failed to parse pipeline output."
+    );
   }
 }

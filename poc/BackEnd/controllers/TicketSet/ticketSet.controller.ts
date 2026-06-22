@@ -10,6 +10,7 @@ import {
 import { getDerivedTestCaseTableByTicketSetId } from "../../services/DerivedTestCase/derivedTestCase.service";
 import { getRawTestCaseTableByTicketSetId } from "../../services/RawTestCase/rawTestCase.service";
 import { getPipelineRunsByTicketSetId } from "../../services/Pipeline/pipelineRun.service";
+import { getPipelineResultsByTicketSetId } from "../../services/Pipeline/pipelineResult.service";
 
 export async function getAllTicketSetsController(_req: Request, res: Response): Promise<void> {
   try {
@@ -165,6 +166,60 @@ export async function getPipelineRunsForTicketSetController(
   } catch (err) {
     console.error("[ticketSet/pipeline-runs]", err);
     res.status(500).json({ error: "Failed to fetch pipeline runs." });
+  }
+}
+
+export async function getPipelineResultsForTicketSetController(
+  req: Request<{ id: string }>,
+  res: Response
+): Promise<void> {
+  try {
+    const results = await getPipelineResultsByTicketSetId(req.params.id);
+
+    res.json({
+      id: req.params.id,
+      name: "Pipeline results",
+      columns: [
+        "result_id",
+        "pipeline_run_id",
+        "derived_test_case_id",
+        "jira_ticket_id",
+        "test_case_id",
+        "result_code",
+        "final_classification",
+        "final_reasoning",
+        "selected_building_block",
+        "ba_context",
+        "guard_notes",
+        "routing_response",
+        "evaluation_response",
+        "raw_evaluation_response",
+        "created_at",
+        "updated_at",
+      ],
+      rows: results.map((result) => ({
+        result_id: result._id,
+        pipeline_run_id: result.pipeline_run_id,
+        derived_test_case_id: result.derived_test_case_id,
+        jira_ticket_id: result.jira_ticket_id,
+        test_case_id: result.test_case_id,
+        result_code: result.result_code,
+        final_classification: result.final_classification,
+        final_reasoning: result.final_reasoning,
+        selected_building_block: result.selected_building_block,
+        ba_context: result.ba_context,
+        guard_notes: result.guard_notes,
+        routing_response: result.routing_response,
+        evaluation_response: result.evaluation_response,
+        raw_evaluation_response: result.raw_evaluation_response,
+        created_at: result.created_at,
+        updated_at: result.updated_at,
+      })),
+      row_count: results.length,
+    });
+  } catch (err) {
+    console.error("[ticketSet/pipeline-results]", err);
+    res.status(500).json({ error: "Failed to fetch pipeline results." });
   }
 }
 

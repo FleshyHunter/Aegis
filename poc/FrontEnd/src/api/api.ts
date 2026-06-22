@@ -188,6 +188,10 @@ export async function fetchPipelineRunsForTicketSet(id: string) {
   return requestJson(`/api/ticket-sets/${id}/pipeline-runs`);
 }
 
+export async function fetchPipelineResultsForTicketSet(id: string) {
+  return requestJson(`/api/ticket-sets/${id}/pipeline-results`);
+}
+
 export async function fetchProjectContexts() {
   return requestJson("/api/project-contexts");
 }

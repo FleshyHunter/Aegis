@@ -1,0 +1,23 @@
+.check-toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-accent);
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+}
+
+.check-toast--visible {
+  opacity: 1;
+}
+
+.check-toast--fading {
+  opacity: 0;
+}
+
+.check-toast-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}

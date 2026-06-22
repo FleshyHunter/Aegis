@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   getAllTicketSetsController,
   getDerivedTestCasesForTicketSetController,
+  getPipelineResultsForTicketSetController,
   getPipelineRunsForTicketSetController,
   getRawTestCasesForTicketSetController,
   getTicketSetByIdController,
@@ -19,6 +20,7 @@ router.post("/ticket-sets/import", importTicketSetController);
 router.get("/ticket-sets/:id/raw-test-cases", getRawTestCasesForTicketSetController);
 router.get("/ticket-sets/:id/derived-test-cases", getDerivedTestCasesForTicketSetController);
 router.get("/ticket-sets/:id/pipeline-runs", getPipelineRunsForTicketSetController);
+router.get("/ticket-sets/:id/pipeline-results", getPipelineResultsForTicketSetController);
 router.get("/ticket-sets/:id", getTicketSetByIdController);
 router.put("/ticket-sets/:id", updateTicketSetNameController);
 router.delete("/ticket-sets/:id", deleteTicketSetController);

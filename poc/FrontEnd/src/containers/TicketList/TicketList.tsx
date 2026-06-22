@@ -45,12 +45,12 @@ export default function TicketList() {
         canRun={ticketImport.rows.length > 0}
         onRun={pipelineRun.handleRun}
         runError={pipelineRun.runError}
-        runMessage={pipelineRun.runMessage}
       />
 
       <TicketRunContextPanel
         value={userPrompt}
         onChange={setUserPrompt}
+        showCompleted={pipelineRun.runMessage !== null}
       />
 
       {selections.activeModal === "ba" && (
