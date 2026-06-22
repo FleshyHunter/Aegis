@@ -23,7 +23,9 @@ Rules for Building Block confirmation:
 - First confirm whether the provided Building Block is the correct match.
 - If the BB is clearly wrong for this test case domain, set building_block_confirmed to false. Do not evaluate frame or currency.
 - If confirmed, proceed with both axes.
-- If building_block_confirmed is true, frame_passed and currency_passed must both be booleans. They may NOT be null.
+- If building_block_confirmed is true, frame_passed must be a boolean.
+- If building_block_confirmed is true and BA rules are available, currency_passed must be a boolean.
+- If building_block_confirmed is true but BA rules are unavailable, currency_passed must be null.
 - If building_block_confirmed is false, frame_passed and currency_passed must both be null.
 
 Rules for Frame Conformance:
@@ -40,7 +42,8 @@ Rules for Requirement Currency:
 - Focus on BA fields that define current expected behaviour, including action labels, status/display values, automation flags, notification requirements, permission flags, validity, and deprecated/obsolete status.
 - Steps and expected results are stronger evidence than title wording.
 - Do not fail currency on title wording alone.
-- If ba_context.mapping_status is not_found or latest_rule is null, currency_passed must be false. A missing or unmappable Result Code is a currency failure, not a Skipped case.
+- If ba_context.mapping_status is unavailable or currency_required is false, set currency_passed to null, currency_reasoning to "BA rules were not provided; requirement currency was not assessed.", and stale_evidence to [].
+- If BA rules are available but ba_context.mapping_status is not_found or latest_rule is null, currency_passed must be false. An unmappable Result Code is a currency failure, not a Skipped case.
 
 Project context rules:
 - project_context_text may describe the domain, product vocabulary, release naming, and known synonyms.
@@ -83,8 +86,10 @@ ADDITIONAL REVIEWER CONTEXT:
 TASK:
 1. Confirm whether the selected Building Block is the correct match for this test case based on its result_code and stated domain.
 2. If confirmed, evaluate Frame Conformance against the Building Block canonical test_steps.
-3. If confirmed, evaluate Requirement Currency against the latest BA rule. If ba_context.mapping_status is not_found or latest_rule is null, set currency_passed to false immediately.
-4. Return your findings in the exact JSON structure below.
+3. If confirmed and BA rules are available, evaluate Requirement Currency against the latest BA rule.
+4. If ba_context.mapping_status is unavailable or currency_required is false, set currency_passed to null and explain that requirement currency was not assessed because BA rules were not provided.
+5. If BA rules are available but ba_context.mapping_status is not_found or latest_rule is null, set currency_passed to false immediately.
+6. Return your findings in the exact JSON structure below.
 
 Return ONLY valid JSON in the schema below. No text before or after.
 
@@ -93,7 +98,9 @@ In the JSON schema below:
 - Do NOT copy placeholder values literally.
 - Populate building_block_id and block_id only from the selected building_block_json.
 - pipeline_run_id must be the actual pipeline run id supplied above.
-- When building_block_confirmed is true, frame_passed and currency_passed must be booleans.
+- When building_block_confirmed is true, frame_passed must be a boolean.
+- When building_block_confirmed is true and BA rules are available, currency_passed must be a boolean.
+- When building_block_confirmed is true and BA rules are unavailable, currency_passed must be null.
 - When building_block_confirmed is false, frame_passed and currency_passed must be null.
 
 When building_block_confirmed is true:
@@ -113,6 +120,22 @@ When building_block_confirmed is true:
   "stale_evidence": [
     "string"
   ],
+  "pipeline_run_id": "string"
+}}
+
+When building_block_confirmed is true but BA rules are unavailable:
+
+{{
+  "building_block_confirmed": true,
+  "building_block_id": "string",
+  "block_id": "string",
+  "building_block_confirmation_reasoning": "string",
+  "frame_passed": true,
+  "frame_reasoning": "string",
+  "missing_canonical_steps": [],
+  "currency_passed": null,
+  "currency_reasoning": "BA rules were not provided; requirement currency was not assessed.",
+  "stale_evidence": [],
   "pipeline_run_id": "string"
 }}
 

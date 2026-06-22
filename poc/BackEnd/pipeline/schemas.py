@@ -85,9 +85,9 @@ def validate_evaluation_response(value: Any) -> EvaluationResponse:
     frame_passed = _optional_bool(value, "frame_passed")
     currency_passed = _optional_bool(value, "currency_passed")
 
-    if confirmed and (frame_passed is None or currency_passed is None):
+    if confirmed and frame_passed is None:
         raise PipelineResponseValidationError(
-            "Confirmed evaluation responses must include boolean frame_passed and currency_passed."
+            "Confirmed evaluation responses must include boolean frame_passed."
         )
 
     if not confirmed and (frame_passed is not None or currency_passed is not None):
@@ -135,7 +135,11 @@ def _optional_string(value: dict[str, Any], field: str) -> str | None:
 def _required_bool(value: dict[str, Any], field: str) -> bool:
     field_value = value.get(field)
     if not isinstance(field_value, bool):
-        raise PipelineResponseValidationError(f"{field} must be a boolean.")
+        coerced = _coerce_bool_string(field_value)
+        if coerced is None:
+            raise PipelineResponseValidationError(f"{field} must be a boolean.")
+
+        return coerced
 
     return field_value
 
@@ -146,9 +150,27 @@ def _optional_bool(value: dict[str, Any], field: str) -> bool | None:
         return None
 
     if not isinstance(field_value, bool):
-        raise PipelineResponseValidationError(f"{field} must be a boolean or null.")
+        coerced = _coerce_bool_string(field_value)
+        if coerced is None:
+            raise PipelineResponseValidationError(f"{field} must be a boolean or null.")
+
+        return coerced
 
     return field_value
+
+
+def _coerce_bool_string(value: Any) -> bool | None:
+    if not isinstance(value, str):
+        return None
+
+    normalized = value.strip().lower()
+    if normalized == "true":
+        return True
+
+    if normalized == "false":
+        return False
+
+    return None
 
 
 def _string_list(value: dict[str, Any], field: str) -> list[str]:

@@ -11,7 +11,7 @@ import { replacePipelineResultsForRun } from "./pipelineResult.service";
 
 interface StartPipelineInput {
   ticketSetId: string;
-  baListId: string;
+  baListId?: string;
   
   buildingBlockIds?: string[];
   userPrompt?: string;
@@ -35,7 +35,7 @@ export async function startPipeline(input: StartPipelineInput): Promise<Pipeline
   const pipelineDir = path.resolve(__dirname, "../../pipeline");
   const scriptPath = path.join(pipelineDir, "run_pipeline.py");
   const buildingBlockIds = input.buildingBlockIds ?? [];
-  const baList = await getBAListById(input.baListId);
+  const baList = input.baListId ? await getBAListById(input.baListId) : null;
   const buildingBlocks = await Promise.all(
     buildingBlockIds.map((id) => getBuildingBlockById(id))
   );
@@ -58,13 +58,14 @@ export async function startPipeline(input: StartPipelineInput): Promise<Pipeline
   try {
     const stdout = await new Promise<string>((resolve, reject) => {
       let output = "";
+      let errorOutput = "";
       const pythonBin = process.env.PYTHON_BIN ?? "python3";
       const proc = spawn(pythonBin, [scriptPath], {
         env: {
           ...process.env,
           PIPELINE_RUN_ID: String(pipelineRun._id),
           TICKET_SET_ID: input.ticketSetId,
-          BA_LIST_ID: input.baListId,
+          BA_LIST_ID: input.baListId ?? "",
           BUILDING_BLOCK_IDS: buildingBlockIds.join(","),
           USER_PROMPT: input.userPrompt ?? "",
           PROJECT_CONTEXT_TEXT: input.projectContext?.contextText ?? "",
@@ -75,13 +76,26 @@ export async function startPipeline(input: StartPipelineInput): Promise<Pipeline
       proc.stdout.on("data", (data) => {
         output += data.toString();
       });
-      proc.stderr.on("data", (data) => console.error("[pipeline]", data.toString()));
+      proc.stderr.on("data", (data) => {
+        const text = data.toString();
+        errorOutput += text;
+        console.error("[pipeline]", text);
+      });
       proc.on("error", (err) => {
         reject(err);
       });
       proc.on("close", (code) => {
         if (code === 0) resolve(output.trim());
-        else reject(new Error(`Pipeline exited with code ${code}`));
+        else {
+          const detail = errorOutput.trim();
+          reject(
+            new Error(
+              detail
+                ? `Pipeline exited with code ${code}: ${detail.slice(-2000)}`
+                : `Pipeline exited with code ${code}`
+            )
+          );
+        }
       });
     });
 

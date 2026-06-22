@@ -52,15 +52,25 @@ def build_ba_context_for_ticket(
 ) -> dict[str, Any]:
     """Select latest and historical BA rows for one ticket result code."""
 
+    normalized_code = result_code.strip().upper() if result_code else None
+    if normalized_ba.get("ba_available") is False:
+        return {
+            "result_code": normalized_code,
+            "latest_rule": None,
+            "historical_rules": [],
+            "mapping_status": "unavailable",
+            "currency_required": False,
+        }
+
     if not result_code:
         return {
             "result_code": None,
             "latest_rule": None,
             "historical_rules": [],
             "mapping_status": "not_found",
+            "currency_required": True,
         }
 
-    normalized_code = result_code.strip().upper()
     rules = normalized_ba.get("rules_by_result_code", {}).get(normalized_code, [])
     latest_rule = normalized_ba.get("latest_by_result_code", {}).get(normalized_code)
 
@@ -69,6 +79,7 @@ def build_ba_context_for_ticket(
         "latest_rule": latest_rule,
         "historical_rules": rules,
         "mapping_status": "found" if latest_rule else "not_found",
+        "currency_required": True,
     }
 
 

@@ -37,6 +37,7 @@ from pipeline.payloads.evaluation_payload_builder import build_evaluation_payloa
 from pipeline.payloads.payload_utils import build_ba_context_for_ticket
 from pipeline.payloads.routing_payload_builder import build_routing_payload
 from pipeline.schemas import (
+    PipelineResponseValidationError,
     validate_evaluation_response,
     validate_routing_response,
 )
@@ -53,7 +54,7 @@ def main() -> None:
 def run_pipeline_from_env() -> dict[str, Any]:
     pipeline_run_id = _required_env("PIPELINE_RUN_ID")
     ticket_set_id = _required_env("TICKET_SET_ID")
-    ba_list_id = _required_env("BA_LIST_ID")
+    ba_list_id = os.getenv("BA_LIST_ID", "").strip()
     building_block_ids = _csv_env("BUILDING_BLOCK_IDS")
     user_prompt_text = os.getenv("USER_PROMPT", "").strip()
     project_context_text = os.getenv("PROJECT_CONTEXT_TEXT", "").strip()
@@ -65,11 +66,11 @@ def run_pipeline_from_env() -> dict[str, Any]:
     routing_client, evaluation_client = _build_dify_clients(use_mock=use_mock)
     max_candidates = _int_env("MAX_EVALUATION_CANDIDATES", DEFAULT_MAX_EVALUATION_CANDIDATES)
 
-    ba_list = load_ba_list(ba_list_id)
+    ba_list = load_ba_list(ba_list_id) if ba_list_id else None
     building_block_docs = load_building_blocks(building_block_ids)
     derived_ticket_table = load_tickets(ticket_set_id)
 
-    normalized_ba = normalize_ba_list(ba_list)
+    normalized_ba = normalize_ba_list(ba_list) if ba_list else _empty_ba_context()
     normalized_building_blocks = normalize_building_blocks(building_block_docs)
     normalized_ticket_table = normalize_ticket_table(derived_ticket_table)
 
@@ -149,7 +150,18 @@ def evaluate_ticket(
             pipeline_run_id=pipeline_run_id,
         )
         evaluation_outputs = evaluation_client.run_workflow_outputs(evaluation_payload)
-        candidate_evaluation = validate_evaluation_response(_extract_result(evaluation_outputs))
+        extracted_evaluation = _extract_result(evaluation_outputs)
+        try:
+            candidate_evaluation = validate_evaluation_response(extracted_evaluation)
+        except PipelineResponseValidationError:
+            _log_dify_validation_failure(
+                phase="Phase 2 evaluation",
+                outputs=evaluation_outputs,
+                extracted=extracted_evaluation,
+                ticket=ticket,
+                building_block=building_block,
+            )
+            raise
         raw_evaluation_response = candidate_evaluation
         frame_checked_evaluation, frame_guard_notes = guard_frame_evaluation(candidate_evaluation)
         currency_checked_evaluation, currency_guard_notes = guard_currency_evaluation(
@@ -197,10 +209,88 @@ def _build_dify_clients(
 
 
 def _extract_result(outputs: dict[str, Any]) -> Any:
-    if "result" in outputs:
-        return outputs["result"]
+    candidate = outputs["result"] if "result" in outputs else outputs
+    return _unwrap_dify_result(candidate)
 
-    return outputs
+
+def _unwrap_dify_result(value: Any) -> Any:
+    """Return the inner structured object from common Dify output wrappers."""
+
+    if isinstance(value, str):
+        try:
+            return _unwrap_dify_result(json.loads(value))
+        except json.JSONDecodeError:
+            return value
+
+    if not isinstance(value, dict):
+        return value
+
+    if _looks_like_pipeline_response(value):
+        return value
+
+    for key in ("structured_output", "result", "output", "outputs"):
+        nested = value.get(key)
+        if nested is not None and nested is not value:
+            unwrapped = _unwrap_dify_result(nested)
+            if _looks_like_pipeline_response(unwrapped):
+                return unwrapped
+
+    return value
+
+
+def _looks_like_pipeline_response(value: Any) -> bool:
+    if not isinstance(value, dict):
+        return False
+
+    return "top_candidates" in value or "building_block_confirmed" in value
+
+
+def _log_dify_validation_failure(
+    *,
+    phase: str,
+    outputs: dict[str, Any],
+    extracted: Any,
+    ticket: dict[str, Any],
+    building_block: dict[str, Any],
+) -> None:
+    print(f"[pipeline debug] {phase} response validation failed.", file=sys.stderr)
+    print(
+        "[pipeline debug] Ticket:",
+        _debug_json(
+            {
+                "derived_test_case_id": ticket.get("derived_test_case_id"),
+                "jira_ticket_id": ticket.get("jira_ticket_id"),
+                "test_case_id": ticket.get("test_case_id"),
+                "result_code": ticket.get("result_code"),
+            }
+        ),
+        file=sys.stderr,
+    )
+    print(
+        "[pipeline debug] BuildingBlock:",
+        _debug_json(
+            {
+                "building_block_id": building_block.get("building_block_id"),
+                "block_id": building_block.get("block_id"),
+                "title": building_block.get("title"),
+            }
+        ),
+        file=sys.stderr,
+    )
+    print("[pipeline debug] Raw Dify outputs:", _debug_json(outputs), file=sys.stderr)
+    print("[pipeline debug] Extracted Dify result:", _debug_json(extracted), file=sys.stderr)
+
+
+def _debug_json(value: Any, *, limit: int = 6000) -> str:
+    try:
+        text = json.dumps(value, ensure_ascii=True, sort_keys=True, default=str)
+    except TypeError:
+        text = repr(value)
+
+    if len(text) <= limit:
+        return text
+
+    return f"{text[:limit]}... [truncated {len(text) - limit} chars]"
 
 
 def _compact_selected_building_block(building_block: dict[str, Any] | None) -> dict[str, Any] | None:
@@ -219,6 +309,7 @@ def _compact_ba_context(ba_context: dict[str, Any]) -> dict[str, Any]:
     return {
         "result_code": ba_context.get("result_code"),
         "mapping_status": ba_context.get("mapping_status"),
+        "currency_required": ba_context.get("currency_required"),
         "latest_rule": _compact_ba_rule(ba_context.get("latest_rule")),
         "historical_rule_count": len(ba_context.get("historical_rules") or []),
     }
@@ -293,6 +384,15 @@ def _int_env(key: str, default: int) -> int:
         raise ValueError(f"{key} must be an integer.") from exc
 
     return max(1, parsed)
+
+
+def _empty_ba_context() -> dict[str, Any]:
+    return {
+        "ba_available": False,
+        "rules_by_result_code": {},
+        "latest_by_result_code": {},
+        "row_count": 0,
+    }
 
 
 if __name__ == "__main__":

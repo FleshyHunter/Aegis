@@ -84,6 +84,7 @@ class TestPayloadUtils(unittest.TestCase):
 
         self.assertEqual(context["result_code"], "IR01")
         self.assertEqual(context["mapping_status"], "found")
+        self.assertTrue(context["currency_required"])
         self.assertEqual(context["latest_rule"]["ba_rule_id"], "BA-0002")
         self.assertEqual(len(context["historical_rules"]), 2)
 
@@ -97,6 +98,19 @@ class TestPayloadUtils(unittest.TestCase):
         self.assertIsNone(context["latest_rule"])
         self.assertEqual(context["historical_rules"], [])
         self.assertEqual(context["mapping_status"], "not_found")
+        self.assertTrue(context["currency_required"])
+
+    def test_build_ba_context_handles_unavailable_ba(self):
+        context = build_ba_context_for_ticket(
+            normalized_ba={"ba_available": False},
+            result_code="IR01",
+        )
+
+        self.assertEqual(context["result_code"], "IR01")
+        self.assertIsNone(context["latest_rule"])
+        self.assertEqual(context["historical_rules"], [])
+        self.assertEqual(context["mapping_status"], "unavailable")
+        self.assertFalse(context["currency_required"])
 
 if __name__ == "__main__":
     unittest.main()

@@ -10,7 +10,10 @@ import {
 import { getDerivedTestCaseTableByTicketSetId } from "../../services/DerivedTestCase/derivedTestCase.service";
 import { getRawTestCaseTableByTicketSetId } from "../../services/RawTestCase/rawTestCase.service";
 import { getPipelineRunsByTicketSetId } from "../../services/Pipeline/pipelineRun.service";
-import { getPipelineResultsByTicketSetId } from "../../services/Pipeline/pipelineResult.service";
+import {
+  getPipelineResultsByTicketSetId,
+  getPipelineResultSummaryByTicketSetId,
+} from "../../services/Pipeline/pipelineResult.service";
 
 export async function getAllTicketSetsController(_req: Request, res: Response): Promise<void> {
   try {
@@ -220,6 +223,34 @@ export async function getPipelineResultsForTicketSetController(
   } catch (err) {
     console.error("[ticketSet/pipeline-results]", err);
     res.status(500).json({ error: "Failed to fetch pipeline results." });
+  }
+}
+
+export async function getPipelineSummaryForTicketSetController(
+  req: Request<{ id: string }>,
+  res: Response
+): Promise<void> {
+  try {
+    const rows = await getPipelineResultSummaryByTicketSetId(req.params.id);
+
+    res.json({
+      id: req.params.id,
+      name: "Pipeline summary",
+      columns: [
+        "jira_ticket_id",
+        "test_case_id",
+        "source_result_code",
+        "classification",
+        "building_block",
+        "explanation",
+        "label_hint",
+      ],
+      rows,
+      row_count: rows.length,
+    });
+  } catch (err) {
+    console.error("[ticketSet/pipeline-summary]", err);
+    res.status(500).json({ error: "Failed to fetch pipeline summary." });
   }
 }
 

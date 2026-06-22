@@ -63,6 +63,27 @@ class TestEvaluationGuards(unittest.TestCase):
         self.assertTrue(checked["stale_evidence"])
         self.assertIn("BA mapping was not found", notes[0])
 
+    def test_currency_guard_marks_unavailable_ba_as_not_assessed(self):
+        checked, notes = guard_currency_evaluation(
+            evaluation=base_evaluation(
+                currency_passed=True,
+                stale_evidence=["Should be cleared."],
+            ),
+            ticket={"result_code": "IR01"},
+            ba_context={
+                "result_code": "IR01",
+                "mapping_status": "unavailable",
+                "currency_required": False,
+                "latest_rule": None,
+                "historical_rules": [],
+            },
+        )
+
+        self.assertIsNone(checked["currency_passed"])
+        self.assertEqual(checked["stale_evidence"], [])
+        self.assertIn("not assessed", checked["currency_reasoning"])
+        self.assertIn("BA rules were not provided", notes[0])
+
     def test_currency_guard_fails_result_code_mismatch(self):
         checked, notes = guard_currency_evaluation(
             evaluation=base_evaluation(currency_passed=True),

@@ -51,6 +51,19 @@ class TestVerdictCombiner(unittest.TestCase):
             "Frame conformance and requirement currency both passed.",
         )
 
+    def test_passes_when_frame_passes_and_ba_is_unavailable(self):
+        evaluation = {
+            "building_block_confirmed": True,
+            "frame_passed": True,
+            "currency_passed": None,
+        }
+
+        self.assertEqual(combine_final_classification(evaluation), "Pass")
+        self.assertEqual(
+            build_final_reasoning(evaluation),
+            "Frame conformance passed. BA rules were not provided, so requirement currency was not assessed.",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

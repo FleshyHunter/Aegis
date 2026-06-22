@@ -9,13 +9,20 @@ export async function runPipelineController(req: Request, res: Response): Promis
     return;
   }
 
-  if (!baListId || typeof baListId !== "string") {
-    res.status(400).json({ error: "baListId is required." });
+  if (baListId !== undefined && typeof baListId !== "string") {
+    res.status(400).json({ error: "baListId must be a string when provided." });
     return;
   }
+  const effectiveBaListId = typeof baListId === "string" && baListId.trim()
+    ? baListId.trim()
+    : undefined;
 
-  if (buildingBlockIds !== undefined && !Array.isArray(buildingBlockIds)) {
-    res.status(400).json({ error: "buildingBlockIds must be an array when provided." });
+  if (
+    !Array.isArray(buildingBlockIds) ||
+    buildingBlockIds.length === 0 ||
+    !buildingBlockIds.every((id) => typeof id === "string" && id.trim())
+  ) {
+    res.status(400).json({ error: "buildingBlockIds must contain at least one Building Block id." });
     return;
   }
 
@@ -27,8 +34,8 @@ export async function runPipelineController(req: Request, res: Response): Promis
   try {
     const result = await startPipeline({
       ticketSetId,
-      baListId,
-      buildingBlockIds: buildingBlockIds ?? [],
+      baListId: effectiveBaListId,
+      buildingBlockIds,
       userPrompt: typeof userPrompt === "string" ? userPrompt : "",
       projectContext,
     });
@@ -37,8 +44,8 @@ export async function runPipelineController(req: Request, res: Response): Promis
       status: result.pipelineRun.run_status,
       pipelineRunId: result.pipelineRun._id,
       ticketSetId,
-      baListId,
-      buildingBlockIds: buildingBlockIds ?? [],
+      baListId: effectiveBaListId ?? null,
+      buildingBlockIds,
       projectContext: projectContext ?? null,
       pipelineOutput: result.stdout,
     });

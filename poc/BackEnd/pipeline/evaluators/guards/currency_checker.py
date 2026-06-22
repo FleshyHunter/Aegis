@@ -46,6 +46,15 @@ def guard_currency_evaluation(
     ba_context_result_code = _normalize_code(ba_context.get("result_code"))
     latest_rule_result_code = _normalize_code(latest_rule.get("result_code")) if isinstance(latest_rule, dict) else None
 
+    if mapping_status == "unavailable" or ba_context.get("currency_required") is False:
+        checked["currency_passed"] = None
+        checked["currency_reasoning"] = (
+            "BA rules were not provided; requirement currency was not assessed."
+        )
+        checked["stale_evidence"] = []
+        notes.append("Currency not assessed because BA rules were not provided.")
+        return checked, notes
+
     if mapping_status != "found" or not isinstance(latest_rule, dict):
         _force_currency_failure(
             checked,

@@ -17,7 +17,7 @@ def combine_final_classification(evaluation: dict[str, Any] | None) -> FinalClas
     if evaluation.get("frame_passed") is False or evaluation.get("currency_passed") is False:
         return "Failed"
 
-    if evaluation.get("frame_passed") is True and evaluation.get("currency_passed") is True:
+    if evaluation.get("frame_passed") is True and evaluation.get("currency_passed") in {True, None}:
         return "Pass"
 
     return "Failed"
@@ -35,6 +35,9 @@ def build_final_reasoning(evaluation: dict[str, Any] | None) -> str:
 
     classification = combine_final_classification(evaluation)
     if classification == "Pass":
+        if evaluation.get("currency_passed") is None:
+            return "Frame conformance passed. BA rules were not provided, so requirement currency was not assessed."
+
         return "Frame conformance and requirement currency both passed."
 
     reasons = [

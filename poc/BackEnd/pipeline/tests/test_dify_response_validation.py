@@ -83,6 +83,46 @@ class TestDifyResponseValidation(unittest.TestCase):
                 }
             )
 
+    def test_validate_evaluation_response_accepts_confirmed_null_currency(self):
+        response = validate_evaluation_response(
+            {
+                "building_block_confirmed": True,
+                "building_block_id": "bb1",
+                "block_id": "BB01",
+                "building_block_confirmation_reasoning": "Correct domain.",
+                "frame_passed": True,
+                "frame_reasoning": "All steps present.",
+                "missing_canonical_steps": [],
+                "currency_passed": None,
+                "currency_reasoning": "BA rules were not provided.",
+                "stale_evidence": [],
+                "pipeline_run_id": "run-1",
+            }
+        )
+
+        self.assertIsNone(response["currency_passed"])
+
+    def test_validate_evaluation_response_coerces_string_booleans(self):
+        response = validate_evaluation_response(
+            {
+                "building_block_confirmed": "true",
+                "building_block_id": "bb1",
+                "block_id": "BB01",
+                "building_block_confirmation_reasoning": "Correct domain.",
+                "frame_passed": "true",
+                "frame_reasoning": "All steps present.",
+                "missing_canonical_steps": [],
+                "currency_passed": None,
+                "currency_reasoning": "BA rules were not provided.",
+                "stale_evidence": [],
+                "pipeline_run_id": "run-1",
+            }
+        )
+
+        self.assertTrue(response["building_block_confirmed"])
+        self.assertTrue(response["frame_passed"])
+        self.assertIsNone(response["currency_passed"])
+
 
 if __name__ == "__main__":
     unittest.main()

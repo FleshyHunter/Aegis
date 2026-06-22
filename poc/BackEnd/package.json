@@ -6,7 +6,9 @@
   "scripts": {
     "dev:server": "ts-node server.ts",
     "dev": "ts-node server.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "python3 -m unittest discover pipeline/tests",
+    "test:pipeline": "python3 -m unittest discover pipeline/tests",
+    "smoke:pipeline": "python3 pipeline/scripts/smoke_repeat_pipeline.py"
   },
   "keywords": [],
   "author": "",

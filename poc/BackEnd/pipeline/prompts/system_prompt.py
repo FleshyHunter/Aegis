@@ -20,7 +20,8 @@ Authorities:
 Classification rules:
 - If no Building Block match is found, classification must be Skipped.
 - If frame conformance fails or requirement currency fails, classification must be Failed.
-- Only pass when frame conformance and requirement currency both pass.
+- Pass when frame conformance passes and requirement currency either passes or is not assessed because BA rules were not provided.
+- If BA rules are not provided, requirement currency is not assessed and frame conformance determines Pass/Failed.
 - Missing or malformed result code should lean Failed, not Skipped.
 
 Never use answer-key or expected-classification fields as evidence. If any such field appears anywhere, ignore it.

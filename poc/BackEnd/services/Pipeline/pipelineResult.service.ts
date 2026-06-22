@@ -4,6 +4,7 @@ import {
   type IPipelineResult,
   type PipelineFinalClassification,
 } from "../../models/PipelineResult/PipelineResult";
+import { getDerivedTestCaseTableByTicketSetId } from "../DerivedTestCase/derivedTestCase.service";
 
 interface PipelineResultOutputRow {
   derived_test_case_id?: unknown;
@@ -24,6 +25,16 @@ interface ReplacePipelineResultsInput {
   pipelineRunId: string;
   ticketSetId: string;
   results: PipelineResultOutputRow[];
+}
+
+export interface PipelineResultSummaryRow {
+  jira_ticket_id: string;
+  test_case_id: string;
+  source_result_code: string;
+  classification: PipelineFinalClassification;
+  building_block: string;
+  explanation: string;
+  label_hint: string;
 }
 
 export async function replacePipelineResultsForRun(
@@ -72,6 +83,47 @@ export async function getPipelineResultsByTicketSetId(ticketSetId: string) {
     .lean();
 }
 
+export async function getPipelineResultSummaryByTicketSetId(
+  ticketSetId: string
+): Promise<PipelineResultSummaryRow[]> {
+  const ticketSetObjectId = toObjectId(ticketSetId, "ticketSetId");
+  const latestResult = await PipelineResult.findOne({
+    ticket_set_id: ticketSetObjectId,
+  })
+    .sort({ created_at: -1 })
+    .lean();
+
+  if (!latestResult) return [];
+
+  const [results, derivedTable] = await Promise.all([
+    PipelineResult.find({
+      ticket_set_id: ticketSetObjectId,
+      pipeline_run_id: latestResult.pipeline_run_id,
+    })
+      .sort({ created_at: 1 })
+      .lean(),
+    getDerivedTestCaseTableByTicketSetId(ticketSetId),
+  ]);
+
+  const labelHints = new Map<string, string>();
+  for (const row of derivedTable?.rows ?? []) {
+    labelHints.set(
+      buildResultKey(row.jira_ticket_id, row.test_case_id),
+      toText(row.label_hint)
+    );
+  }
+
+  return results.map((result) => ({
+    jira_ticket_id: result.jira_ticket_id,
+    test_case_id: result.test_case_id,
+    source_result_code: result.result_code,
+    classification: result.final_classification,
+    building_block: getSelectedBuildingBlockTitle(result.selected_building_block),
+    explanation: result.final_reasoning,
+    label_hint: labelHints.get(buildResultKey(result.jira_ticket_id, result.test_case_id)) ?? "",
+  }));
+}
+
 function toObjectId(value: string, fieldName: string): Types.ObjectId {
   if (!Types.ObjectId.isValid(value)) {
     throw new Error(`Invalid ${fieldName}.`);
@@ -90,6 +142,13 @@ function toObjectOrNull(value: unknown): Record<string, unknown> | null {
   return value as Record<string, unknown>;
 }
 
+function getSelectedBuildingBlockTitle(value: unknown): string {
+  const selected = toObjectOrNull(value);
+  if (!selected) return "";
+
+  return toText(selected.title ?? selected.block_id ?? selected.building_block_id);
+}
+
 function toStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
 
@@ -104,4 +163,8 @@ function toFinalClassification(value: unknown): PipelineFinalClassification {
   }
 
   return "";
+}
+
+function buildResultKey(jiraTicketId: unknown, testCaseId: unknown): string {
+  return `${toText(jiraTicketId).toLowerCase()}::${toText(testCaseId).toLowerCase()}`;
 }

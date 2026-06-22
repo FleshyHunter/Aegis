@@ -13,9 +13,10 @@ Evaluate two independent axes:
 - Matching is semantic and evidence-based, not strict row-by-row position matching.
 
 2. Requirement currency
-- Use the test case result_code to find the latest BA rule.
-- Compare the test case evidence against the latest BA rule.
-- Use historical BA rows only as context for explaining staleness.
+- If BA rules are provided, use the test case result_code to find the latest BA rule.
+- If BA rules are provided, compare the test case evidence against the latest BA rule.
+- If BA rules are unavailable, requirement currency is not assessed.
+- Use historical BA rows only as context for explaining staleness when BA rules are provided.
 - Steps and expected results are stronger evidence than title wording.
 - Check BA fields that define current expected behaviour, including action labels, status/display values, automation flags, notification requirements, permission flags, validity, and deprecated/obsolete status.
 
