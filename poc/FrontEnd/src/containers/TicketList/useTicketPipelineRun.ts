@@ -1,11 +1,13 @@
 import { useState } from "react";
 import {
   createProjectContext,
+  fetchPipelineSummaryForTicketSet,
   importBAList,
   importTicketSet,
   runPipeline,
   uploadBuildingBlock,
 } from "../../api/api";
+import type { PipelineSummaryRow } from "../../api/api";
 import type {
   BuildingBlockSelection,
 } from "../../components/BuildingBlockSelectModal/BuildingBlockSelectModal";
@@ -48,13 +50,10 @@ export function useTicketPipelineRun({
   const [running, setRunning] = useState(false);
   const [runError, setRunError] = useState<string | null>(null);
   const [runMessage, setRunMessage] = useState<string | null>(null);
+  const [summaryRows, setSummaryRows] = useState<PipelineSummaryRow[]>([]);
 
   async function handleRun() {
     if (!jiraFileName || !rawRows.length) return;
-    if (!baId && !baIsNew) {
-      setRunError("Please select a BA Rules file before running.");
-      return;
-    }
     if (!selectedBuildingBlocks.length) {
       setRunError("Please select at least one Building Block before running.");
       return;
@@ -63,6 +62,7 @@ export function useTicketPipelineRun({
     setRunning(true);
     setRunError(null);
     setRunMessage(null);
+    setSummaryRows([]);
 
     try {
       let baListId = baId;
@@ -105,7 +105,7 @@ export function useTicketPipelineRun({
 
       await runPipeline({
         ticketSetId: ticketSet.id,
-        baListId,
+        baListId: baListId || undefined,
         buildingBlockIds: uploadedBuildingBlocks.map((entry) => entry.id),
         userPrompt,
         projectContext: effectiveProjectContext
@@ -116,6 +116,9 @@ export function useTicketPipelineRun({
             }
           : undefined,
       });
+
+      const summary = await fetchPipelineSummaryForTicketSet(ticketSet.id);
+      setSummaryRows(Array.isArray(summary.rows) ? summary.rows : []);
 
       setRunMessage("Pipeline started. Derived test cases are available in Ticket Sets.");
     } catch (err) {
@@ -129,6 +132,7 @@ export function useTicketPipelineRun({
     running,
     runError,
     runMessage,
+    summaryRows,
     handleRun,
   };
 }

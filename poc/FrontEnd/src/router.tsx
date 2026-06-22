@@ -13,11 +13,17 @@ import TicketSetRaw from "./containers/TicketSets/TicketSetRaw";
 import TicketSetDerived from "./containers/TicketSets/TicketSetDerived";
 import TicketSetPipeline from "./containers/TicketSets/TicketSetPipeline";
 import TicketSetResults from "./containers/TicketSets/TicketSetResults";
+import TicketSetSummary from "./containers/TicketSets/TicketSetSummary";
+import Guide from "./containers/Guide/Guide";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
+  },
+  {
+    path: "/guide",
+    element: <Guide />,
   },
   {
     path: "/ba",
@@ -66,6 +72,10 @@ const router = createBrowserRouter([
   {
     path: "/ticket-sets/:id/results",
     element: <TicketSetResults />,
+  },
+  {
+    path: "/ticket-sets/:id/summary",
+    element: <TicketSetSummary />,
   },
   {
     path: "/tickets",

@@ -72,6 +72,16 @@ export interface EntrySummary {
   created_at: string;
 }
 
+export interface PipelineSummaryRow extends Record<string, string> {
+  jira_ticket_id: string;
+  test_case_id: string;
+  source_result_code: string;
+  classification: "Pass" | "Failed" | "Skipped" | "";
+  building_block: string;
+  explanation: string;
+  label_hint: string;
+}
+
 export async function importBAList(name: string, rows: Record<string, string>[]) {
   return requestJson("/api/ba-lists", {
     method: "POST",
@@ -190,6 +200,10 @@ export async function fetchPipelineRunsForTicketSet(id: string) {
 
 export async function fetchPipelineResultsForTicketSet(id: string) {
   return requestJson(`/api/ticket-sets/${id}/pipeline-results`);
+}
+
+export async function fetchPipelineSummaryForTicketSet(id: string) {
+  return requestJson(`/api/ticket-sets/${id}/pipeline-summary`);
 }
 
 export async function fetchProjectContexts() {

@@ -27,6 +27,8 @@ from pipeline.evaluators.verdict.verdict_combiner import (
     build_final_reasoning,
     combine_final_classification,
 )
+from pipeline.execution.parallel_runner import run_ordered_parallel
+from pipeline.execution.rate_limiter import DifyRateLimiter
 from pipeline.loaders.ba_loader import load_ba_list
 from pipeline.loaders.building_block_loader import load_building_blocks
 from pipeline.loaders.ticket_loader import load_tickets
@@ -44,6 +46,8 @@ from pipeline.schemas import (
 
 
 DEFAULT_MAX_EVALUATION_CANDIDATES = 2
+DEFAULT_MAX_DIFY_RPM = 60
+DEFAULT_MAX_PARALLEL_TICKETS = 2
 
 
 def main() -> None:
@@ -65,6 +69,11 @@ def run_pipeline_from_env() -> dict[str, Any]:
     use_mock = _truthy(os.getenv("USE_MOCK_LLM"))
     routing_client, evaluation_client = _build_dify_clients(use_mock=use_mock)
     max_candidates = _int_env("MAX_EVALUATION_CANDIDATES", DEFAULT_MAX_EVALUATION_CANDIDATES)
+    max_parallel_tickets = _int_env("MAX_PARALLEL_TICKETS", DEFAULT_MAX_PARALLEL_TICKETS)
+    dify_rate_limiter = DifyRateLimiter(
+        rpm=_int_env("MAX_DIFY_RPM", DEFAULT_MAX_DIFY_RPM),
+        enabled=not use_mock,
+    )
 
     ba_list = load_ba_list(ba_list_id) if ba_list_id else None
     building_block_docs = load_building_blocks(building_block_ids)
@@ -73,21 +82,27 @@ def run_pipeline_from_env() -> dict[str, Any]:
     normalized_ba = normalize_ba_list(ba_list) if ba_list else _empty_ba_context()
     normalized_building_blocks = normalize_building_blocks(building_block_docs)
     normalized_ticket_table = normalize_ticket_table(derived_ticket_table)
+    tickets = normalized_ticket_table["tickets"]
 
-    results = [
-        evaluate_ticket(
+    def evaluate_one(ticket: dict[str, Any]) -> dict[str, Any]:
+        return evaluate_ticket(
             ticket=ticket,
             normalized_ba=normalized_ba,
             building_blocks=normalized_building_blocks,
             routing_client=routing_client,
             evaluation_client=evaluation_client,
+            dify_rate_limiter=dify_rate_limiter,
             project_context_text=project_context_text,
             user_prompt_text=user_prompt_text,
             pipeline_run_id=pipeline_run_id,
             max_candidates=max_candidates,
         )
-        for ticket in normalized_ticket_table["tickets"]
-    ]
+
+    results = run_ordered_parallel(
+        items=tickets,
+        worker=evaluate_one,
+        max_workers=max_parallel_tickets,
+    )
 
     counts = _summarize_results(results)
 
@@ -110,6 +125,7 @@ def evaluate_ticket(
     building_blocks: list[dict[str, Any]],
     routing_client: DifyClient | MockDifyClient,
     evaluation_client: DifyClient | MockDifyClient,
+    dify_rate_limiter: "DifyRateLimiter",
     project_context_text: str,
     user_prompt_text: str,
     pipeline_run_id: str,
@@ -122,8 +138,19 @@ def evaluate_ticket(
         user_prompt_text=user_prompt_text,
         pipeline_run_id=pipeline_run_id,
     )
-    routing_outputs = routing_client.run_workflow_outputs(routing_payload)
-    routing_response = validate_routing_response(_extract_result(routing_outputs))
+    routing_outputs = dify_rate_limiter.run(routing_client, routing_payload)
+    extracted_routing = _extract_result(routing_outputs)
+    try:
+        routing_response = validate_routing_response(extracted_routing)
+    except PipelineResponseValidationError:
+        _log_dify_validation_failure(
+            phase="Phase 1 routing",
+            outputs=routing_outputs,
+            extracted=extracted_routing,
+            ticket=ticket,
+            building_block={},
+        )
+        raise
     selected_building_blocks = select_candidate_building_blocks(
         routing_response,
         building_blocks,
@@ -149,7 +176,7 @@ def evaluate_ticket(
             user_prompt_text=user_prompt_text,
             pipeline_run_id=pipeline_run_id,
         )
-        evaluation_outputs = evaluation_client.run_workflow_outputs(evaluation_payload)
+        evaluation_outputs = dify_rate_limiter.run(evaluation_client, evaluation_payload)
         extracted_evaluation = _extract_result(evaluation_outputs)
         try:
             candidate_evaluation = validate_evaluation_response(extracted_evaluation)
@@ -253,9 +280,13 @@ def _log_dify_validation_failure(
     ticket: dict[str, Any],
     building_block: dict[str, Any],
 ) -> None:
-    print(f"[pipeline debug] {phase} response validation failed.", file=sys.stderr)
+    ticket_label = _ticket_debug_label(ticket)
     print(
-        "[pipeline debug] Ticket:",
+        f"[pipeline debug] [{ticket_label}] {phase} response validation failed.",
+        file=sys.stderr,
+    )
+    print(
+        f"[pipeline debug] [{ticket_label}] Ticket:",
         _debug_json(
             {
                 "derived_test_case_id": ticket.get("derived_test_case_id"),
@@ -267,18 +298,43 @@ def _log_dify_validation_failure(
         file=sys.stderr,
     )
     print(
-        "[pipeline debug] BuildingBlock:",
-        _debug_json(
-            {
-                "building_block_id": building_block.get("building_block_id"),
-                "block_id": building_block.get("block_id"),
-                "title": building_block.get("title"),
-            }
-        ),
+        f"[pipeline debug] [{ticket_label}] BuildingBlock:",
+        _debug_json(_compact_debug_building_block(building_block)),
         file=sys.stderr,
     )
-    print("[pipeline debug] Raw Dify outputs:", _debug_json(outputs), file=sys.stderr)
-    print("[pipeline debug] Extracted Dify result:", _debug_json(extracted), file=sys.stderr)
+    print(
+        f"[pipeline debug] [{ticket_label}] Raw Dify outputs:",
+        _debug_json(outputs),
+        file=sys.stderr,
+    )
+    print(
+        f"[pipeline debug] [{ticket_label}] Extracted Dify result:",
+        _debug_json(extracted),
+        file=sys.stderr,
+    )
+
+
+def _ticket_debug_label(ticket: dict[str, Any]) -> str:
+    return " / ".join(
+        str(value)
+        for value in [
+            ticket.get("jira_ticket_id"),
+            ticket.get("test_case_id"),
+            ticket.get("derived_test_case_id"),
+        ]
+        if value
+    ) or "unknown ticket"
+
+
+def _compact_debug_building_block(building_block: dict[str, Any]) -> dict[str, Any] | str:
+    if not building_block:
+        return "not selected yet"
+
+    return {
+        "building_block_id": building_block.get("building_block_id"),
+        "block_id": building_block.get("block_id"),
+        "title": building_block.get("title"),
+    }
 
 
 def _debug_json(value: Any, *, limit: int = 6000) -> str:

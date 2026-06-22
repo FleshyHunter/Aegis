@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import "./TicketList.css";
 import Navbar from "../../components/Layout/Navbar";
 import CsvSelectModal from "../../components/CsvSelectModal/CsvSelectModal";
@@ -12,6 +12,7 @@ import TicketRunContextPanel from "./TicketRunContextPanel";
 import { useTicketImport } from "./useTicketImport";
 import { useTicketPipelineRun } from "./useTicketPipelineRun";
 import { useTicketSelections } from "./useTicketSelections";
+import type { TicketRow } from "./TicketList.types";
 
 export default function TicketList() {
   const [userPrompt, setUserPrompt] = useState("");
@@ -32,6 +33,10 @@ export default function TicketList() {
     setSelectedProjectContext: selections.setSelectedProjectContext,
     userPrompt,
   });
+  const displayRows = useMemo(
+    () => filterRows(mergeSummaryRows(ticketImport.rows, pipelineRun.summaryRows), ticketImport.filter),
+    [pipelineRun.summaryRows, ticketImport.filter, ticketImport.rows]
+  );
 
   return (
     <div>
@@ -90,7 +95,50 @@ export default function TicketList() {
         />
       )}
 
-      <TicketListTable rows={ticketImport.filteredRows} />
+      <TicketListTable rows={displayRows} />
     </div>
   );
+}
+
+function mergeSummaryRows(
+  rows: TicketRow[],
+  summaryRows: TicketRow[]
+): TicketRow[] {
+  if (!summaryRows.length) return rows;
+
+  const summaryByKey = new Map(
+    summaryRows.map((summary) => [buildTicketKey(summary), summary])
+  );
+
+  return rows.map((row) => {
+    const summary = summaryByKey.get(buildTicketKey(row));
+    if (!summary) return row;
+
+    return {
+      ...row,
+      source_result_code: summary.source_result_code,
+      classification: summary.classification,
+      building_block: summary.building_block,
+      explanation: summary.explanation,
+      label_hint: summary.label_hint || row.label_hint,
+    };
+  });
+}
+
+function filterRows(rows: TicketRow[], filter: string): TicketRow[] {
+  if (filter === "All") return rows;
+
+  return rows.filter((row) => getFilterValue(row.classification) === filter);
+}
+
+function buildTicketKey(row: TicketRow): string {
+  return `${(row.jira_ticket_id || "").toLowerCase()}::${(row.test_case_id || "").toLowerCase()}`;
+}
+
+function getFilterValue(classification = ""): string {
+  const normalized = classification.trim().toLowerCase();
+  if (normalized === "pass") return "PASSED";
+  if (normalized === "failed") return "FAILED";
+  if (normalized === "skipped") return "SKIPPED";
+  return "";
 }

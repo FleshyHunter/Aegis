@@ -9,6 +9,7 @@ export default function Navbar() {
       </Link>
       <nav className="navbar-links">
         <NavLink to="/" end className={({ isActive }) => isActive ? "navbar-pill active" : "navbar-pill"}>Home</NavLink>
+        <NavLink to="/guide" className={({ isActive }) => isActive ? "navbar-pill active" : "navbar-pill"}>Guide</NavLink>
         <NavLink to="/project-contexts" className={({ isActive }) => isActive ? "navbar-pill active" : "navbar-pill"}>Project Context</NavLink>
         <NavLink to="/ba" className={({ isActive }) => isActive ? "navbar-pill active" : "navbar-pill"}>BA Rules</NavLink>
         <NavLink to="/building-blocks" className={({ isActive }) => isActive ? "navbar-pill active" : "navbar-pill"}>Building Blocks</NavLink>

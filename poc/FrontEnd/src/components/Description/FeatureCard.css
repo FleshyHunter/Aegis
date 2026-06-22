@@ -82,3 +82,7 @@
   line-height: 1.7;
   margin: 0;
 }
+
+.feature-card-body {
+  margin-top: 20px;
+}

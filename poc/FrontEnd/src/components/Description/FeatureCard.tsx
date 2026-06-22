@@ -8,9 +8,10 @@ interface Props {
   description: string;
   index: number;
   to: string;
+  children?: React.ReactNode;
 }
 
-export default function FeatureCard({ title, description, index, to }: Props) {
+export default function FeatureCard({ title, description, index, to, children }: Props) {
   const navigate = useNavigate();
   const { ref, state } = useScrollReveal(0.15);
   const num = String(index + 1).padStart(2, "0");
@@ -26,6 +27,7 @@ export default function FeatureCard({ title, description, index, to }: Props) {
       </div>
       <div className="feature-card-divider" />
       <p className="feature-card-description">{description}</p>
+      {children && <div className="feature-card-body">{children}</div>}
     </div>
   );
 }

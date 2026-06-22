@@ -37,6 +37,7 @@ const VIEW_TABS = [
   { key: "derived", label: "Derived", path: "derived" },
   { key: "pipeline", label: "Pipeline", path: "pipeline" },
   { key: "results", label: "Results", path: "results" },
+  { key: "summary", label: "Summary", path: "summary" },
 ];
 
 export function TicketSetTableView({ emptyMessage, fetchTable }: TicketSetTableViewProps) {

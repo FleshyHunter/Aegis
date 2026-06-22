@@ -18,11 +18,13 @@ Latest known-good run set, captured from Mongo:
   - 6a2c2f550d976a9583531b4c: BB03_Iris_Enrollment___First_Time_Traveller.docx
 
 Equivalent command:
-python3 pipeline/scripts/smoke_repeat_pipeline.py --runs 5 \
+
+MAX_PARALLEL_TICKETS=5 MAX_DIFY_RPM=60 python3 pipeline/scripts/smoke_repeat_pipeline.py --runs 3 \
   --ticket-set-id 6a38b749f487253ce4eefb95 \
   --ba-list-id 6a2c22d80d976a9583531b10 \
-  --building-block-ids 6a2c2f4e0d976a9583531b4a,6a2c2f510d976a9583531b4b,6a2c2f550d976a9583531b4c
-
+  --building-block-ids 6a2c2f4e0d976a9583531b4a,6a2c2f510d976a9583531b4b,6a2c2f550d976a9583531b4c \
+  --log-dir smoke-logs/parallel-5
+  
 Copy paste the command above to run this script, and vary fields for testing.
 """
 
@@ -45,7 +47,11 @@ BACKEND_DIR = SCRIPT_PATH.parents[2]
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
-from pipeline.run_pipeline import run_pipeline_from_env
+from pipeline.run_pipeline import (
+    DEFAULT_MAX_DIFY_RPM,
+    DEFAULT_MAX_PARALLEL_TICKETS,
+    run_pipeline_from_env,
+)
 
 
 DEFAULT_MONGO_URI = "mongodb://localhost:27017/AEGIS"
@@ -69,6 +75,8 @@ def main() -> None:
     print(f"- ba_list_id: {selected['ba_list_id'] or '(none)'}")
     print(f"- building_block_count: {len(selected['building_block_ids'])}")
     print(f"- mode: {'mock' if args.mock else 'real Dify'}")
+    print(f"- MAX_PARALLEL_TICKETS: {effective_env_value('MAX_PARALLEL_TICKETS', DEFAULT_MAX_PARALLEL_TICKETS)}")
+    print(f"- MAX_DIFY_RPM: {effective_env_value('MAX_DIFY_RPM', DEFAULT_MAX_DIFY_RPM)}")
     print(f"- runs: {args.runs}")
 
     attempts = 0
@@ -241,6 +249,11 @@ def apply_pipeline_env(
         os.environ["USE_MOCK_LLM"] = "true"
     else:
         os.environ.pop("USE_MOCK_LLM", None)
+
+
+def effective_env_value(key: str, default: int) -> str:
+    value = os.getenv(key, "").strip()
+    return value or str(default)
 
 
 def summarize_output(output: dict[str, Any]) -> dict[str, Any]:

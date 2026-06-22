@@ -19,6 +19,7 @@ venv/
 # Logs
 *.log
 npm-debug.log*
+smoke-logs/
 
 # Local test data
 testdata/
@@ -38,4 +39,4 @@ Thumbs.db
 .claude/
 
 # Misc
-./logos
+logos/
