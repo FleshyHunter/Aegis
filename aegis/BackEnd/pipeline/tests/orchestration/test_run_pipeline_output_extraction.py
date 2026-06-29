@@ -1,11 +1,11 @@
 import unittest
 
-from pipeline.run_pipeline import _extract_result
+from pipeline.ai.schemas.response_parser import extract_result
 
 
-class TestRunPipelineOutputExtraction(unittest.TestCase):
+class TestResponseParser(unittest.TestCase):
     def test_extract_result_unwraps_dify_structured_output(self):
-        result = _extract_result(
+        result = extract_result(
             {
                 "result": {
                     "text": "{}",
@@ -21,7 +21,7 @@ class TestRunPipelineOutputExtraction(unittest.TestCase):
         self.assertEqual(result["building_block_id"], "bb1")
 
     def test_extract_result_unwraps_json_string_result(self):
-        result = _extract_result(
+        result = extract_result(
             {
                 "result": (
                     '{"top_candidates":[],"routing_summary":"No match",'

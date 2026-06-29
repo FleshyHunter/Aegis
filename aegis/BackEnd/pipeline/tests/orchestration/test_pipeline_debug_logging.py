@@ -1,12 +1,15 @@
 import unittest
 
-from pipeline.run_pipeline import _compact_debug_building_block, _ticket_debug_label
+from pipeline.ai.schemas.response_debug import (
+    compact_debug_building_block,
+    ticket_debug_label,
+)
 
 
 class TestPipelineDebugLogging(unittest.TestCase):
     def test_ticket_debug_label_uses_stable_ticket_identifiers(self):
         self.assertEqual(
-            _ticket_debug_label(
+            ticket_debug_label(
                 {
                     "jira_ticket_id": "JT-0001",
                     "test_case_id": "TC-0001",
@@ -17,10 +20,10 @@ class TestPipelineDebugLogging(unittest.TestCase):
         )
 
     def test_ticket_debug_label_handles_missing_identifiers(self):
-        self.assertEqual(_ticket_debug_label({}), "unknown ticket")
+        self.assertEqual(ticket_debug_label({}), "unknown ticket")
 
     def test_compact_debug_building_block_handles_missing_selection(self):
-        self.assertEqual(_compact_debug_building_block({}), "not selected yet")
+        self.assertEqual(compact_debug_building_block({}), "not selected yet")
 
 
 if __name__ == "__main__":
