@@ -15,6 +15,10 @@ import TicketSetPipeline from "./containers/TicketSets/TicketSetPipeline";
 import TicketSetResults from "./containers/TicketSets/TicketSetResults";
 import TicketSetSummary from "./containers/TicketSets/TicketSetSummary";
 import Guide from "./containers/Guide/Guide";
+import ProjectContextGuide from "./containers/Guide/ProjectContextGuide";
+import BARulesGuide from "./containers/Guide/BARulesGuide";
+import BuildingBlocksGuide from "./containers/Guide/BuildingBlocksGuide";
+import TicketSetsGuide from "./containers/Guide/TicketSetsGuide";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +28,22 @@ const router = createBrowserRouter([
   {
     path: "/guide",
     element: <Guide />,
+  },
+  {
+    path: "/guide/project-contexts",
+    element: <ProjectContextGuide />,
+  },
+  {
+    path: "/guide/ba",
+    element: <BARulesGuide />,
+  },
+  {
+    path: "/guide/building-blocks",
+    element: <BuildingBlocksGuide />,
+  },
+  {
+    path: "/guide/ticket-sets",
+    element: <TicketSetsGuide />,
   },
   {
     path: "/ba",

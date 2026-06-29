@@ -6,7 +6,7 @@ import "./Guide.css";
 const STEPS = [
   {
     title: "Project Context",
-    to: "/project-contexts",
+    to: "/guide/project-contexts",
     description:
       "Optional but recommended. Store reusable domain vocabulary, naming conventions, and interpretation rules that apply across multiple pipeline runs. A good Project Context explains what your system does, what terminology is used, and how the evaluator should interpret ambiguous wording — without overriding BA or Building Block truth.",
     schema: {
@@ -21,19 +21,19 @@ const STEPS = [
   },
   {
     title: "BA Rules",
-    to: "/ba",
+    to: "/guide/ba",
     description:
       "Optional, but authoritative for currency checks when provided. Upload a CSV where each row describes one version of a business rule keyed by result_code. The pipeline selects the latest release row per result_code and checks the test case against it. If no BA is uploaded, currency is not evaluated.",
     schema: {
       type: "table",
-      columns: ["result_code", "release", "action_labels", "exception_colour", "is_valid_in_current_project", "is_deprecated_or_obsolete"],
-      example: ["RC01", "SR4", "Approve Request | Reject Request | Escalate Review", "Orange", "true", "false"],
+      columns: ["result_code", "release", "action_labels", "is_valid_in_current_project", "is_deprecated_or_obsolete"],
+      example: ["RC01", "SR4", "Approve Request | Reject Request | Escalate Review", "true", "false"],
     },
     tip: "Keep result_code naming consistent across BA Rules and your Ticket Set. Mismatched codes cause currency to be marked not found.",
   },
   {
     title: "Building Blocks",
-    to: "/building-blocks",
+    to: "/guide/building-blocks",
     description:
       "Required. Upload a DOCX file for each canonical workflow. A Building Block defines the routing rule (which test cases belong to it), preconditions, and the ordered canonical test steps the pipeline checks for frame conformance. One DOCX = one workflow. Do not mix unrelated workflows in a single file.",
     schema: {
@@ -49,7 +49,7 @@ const STEPS = [
   },
   {
     title: "Ticket Set",
-    to: "/tickets",
+    to: "/guide/ticket-sets",
     description:
       "Required. Upload a CSV where each row is one test case. The backend derives a normalised DerivedTestCase from each row before evaluation. The key fields the pipeline relies on are result_code (from the title), description, and steps.",
     schema: {

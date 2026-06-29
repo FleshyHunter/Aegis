@@ -96,26 +96,25 @@ export default function Home() {
             index={1}
             to="/ba"
             title="BA Rules"
-            description="Import and manage BA rule sets. Each CSV defines the expected system behaviour for every
-             exception type, organised by release. Use this as your source of truth — track the latest version of
-              any exception rule and cross-reference it against your test cases to catch outdated or inconsistent entries."
+            description="Import and manage BA rule sets used for requirement-currency checks. Each CSV maps result
+             codes to expected behaviour by release, helping the pipeline identify whether a test case still reflects
+              the latest known rule when BA context is provided."
           />
           <FeatureCard
             index={2}
             to="/building-blocks"
             title="Building Blocks"
-            description="Import and organise building block sets. A building block defines the standard structure
-             and core flow that all test cases of the same type must follow — all similar test cases will share one
-              common building block as their foundation. This keeps related test cases consistent and acts as a
-               checker to flag any test case that deviates from the expected flow of its group."
+            description="Import and organise canonical test flows. Building Blocks are the required frame reference
+             for evaluation: the pipeline routes each derived test case to the most relevant block, then checks whether
+              its steps cover the expected structure while allowing harmless extra detail."
           />
           <FeatureCard
             index={3}
             to="/ticket-sets"
             title="Ticket Sets"
-            description="A history of all pipeline runs. Each entry captures the validation results for a ticket
-             set — recording how each test case was classified against its building block and BA rule set. Review
-              past runs, compare results across versions, and identify test cases that need attention."
+            description="View imported test-case batches and their related pipeline views. Each Ticket Set keeps the
+             original raw upload, the derived normalized table, recorded pipeline runs, detailed results, and a summary
+              view so you can inspect how each test case moved through the evaluation flow."
           />
           <FeatureCard
             index={4}
