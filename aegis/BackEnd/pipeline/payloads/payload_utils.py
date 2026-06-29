@@ -9,7 +9,7 @@ from typing import Any
 
 FORBIDDEN_KEYS = {"label_hint"}
 DEFAULT_RESPONSE_MODE = "blocking"
-DEFAULT_DIFY_USER = "aegis-poc"
+DEFAULT_DIFY_USER = "aegis"
 
 
 def strip_forbidden_keys(value: Any) -> Any:

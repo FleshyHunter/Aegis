@@ -44,7 +44,7 @@ class TestEvaluationPayloadBuilder(unittest.TestCase):
         building_block_json = json.loads(inputs["building_block_json"])
 
         self.assertEqual(payload["response_mode"], "blocking")
-        self.assertEqual(payload["user"], "aegis-poc")
+        self.assertEqual(payload["user"], "aegis")
         self.assertEqual(inputs["pipeline_run_id"], "run-1")
         self.assertEqual(
             inputs["project_context_text"],

@@ -1,13 +1,13 @@
 """Run the QA consistency-checking POC.
 
 Usage:
-    USE_MOCK_LLM=true python3 poc/run_poc.py
+    USE_MOCK_LLM=true python3 aegis/run_poc.py
 
 For a real OpenAI-compatible endpoint, set:
     LLM_BASE_URL=http://your-endpoint/v1
     LLM_API_KEY=your-token-if-needed
     LLM_MODEL=your-model-name
-    python3 poc/run_poc.py
+    python3 aegis/run_poc.py
 """
 
 from __future__ import annotations

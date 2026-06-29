@@ -30,7 +30,7 @@ AEGIS is designed to assist QA review. It does not auto-fix test cases or update
 ```text
 .
 ├── docker-compose.yml
-├── poc
+├── aegis
 │   ├── BackEnd
 │   │   ├── controllers
 │   │   ├── database
@@ -60,14 +60,14 @@ AEGIS is designed to assist QA review. It does not auto-fix test cases or update
 Install dependencies:
 
 ```bash
-cd poc
+cd aegis
 npm run install:all
 ```
 
 Run frontend and backend locally:
 
 ```bash
-cd poc
+cd aegis
 npm run all
 ```
 
@@ -96,7 +96,7 @@ curl http://localhost:3000/health
 
 ## Environment Variables
 
-Backend `.env` values can be placed at the repo root or inside `poc/BackEnd`.
+Backend `.env` values can be placed at the repo root or inside `aegis/BackEnd`.
 
 ```env
 MONGO_URI=mongodb://localhost:27017/AEGIS
@@ -153,20 +153,20 @@ Both workflows should return the LLM structured output through an Output node na
 Run Python pipeline tests:
 
 ```bash
-cd poc/BackEnd
+cd aegis/BackEnd
 python3 -m unittest discover -s pipeline/tests
 ```
 
 Run frontend build check:
 
 ```bash
-npm run build --prefix poc/FrontEnd
+npm run build --prefix aegis/FrontEnd
 ```
 
 Run backend TypeScript check:
 
 ```bash
-cd poc/BackEnd
+cd aegis/BackEnd
 npx --no-install tsc --noEmit
 ```
 

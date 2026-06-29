@@ -78,7 +78,7 @@ class TestRoutingPayloadBuilder(unittest.TestCase):
         bb_candidates_json = json.loads(inputs["bb_candidates_json"])
 
         self.assertEqual(payload["response_mode"], "blocking")
-        self.assertEqual(payload["user"], "aegis-poc")
+        self.assertEqual(payload["user"], "aegis")
         self.assertEqual(inputs["pipeline_run_id"], "run-1")
         self.assertEqual(inputs["project_context_text"], "Product-specific context belongs here.")
         self.assertEqual(inputs["user_prompt_text"], "Treat camera as scanner.")

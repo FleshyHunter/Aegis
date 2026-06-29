@@ -96,7 +96,7 @@ class TestDifyClient(unittest.TestCase):
         self.assertEqual(request.full_url, "https://api.test/v1/workflows/run")
         self.assertEqual(request.headers["Authorization"], "Bearer secret")
         self.assertEqual(sent_payload["response_mode"], "blocking")
-        self.assertEqual(sent_payload["user"], "aegis-poc")
+        self.assertEqual(sent_payload["user"], "aegis")
         self.assertEqual(sent_payload["inputs"]["ticket"]["jira_ticket_id"], "JT-0001")
         self.assertEqual(urlopen.call_args.kwargs["timeout"], 7)
 

@@ -15,7 +15,7 @@ services:
 
   api:
     build:
-      context: ./poc/BackEnd
+      context: ./aegis/BackEnd
       dockerfile: docker/Dockerfile.node
     container_name: aegis-api
     restart: unless-stopped
@@ -26,17 +26,13 @@ services:
       PYTHON_BIN: /usr/bin/python3
       USE_MOCK_LLM: ${USE_MOCK_LLM:-false}
       DIFY_BASE_URL: ${DIFY_BASE_URL:-}
-      
-      #Uncomment for Aaron API keys
-      # DIFY_ROUTING_API_KEY: ${DIFY_ROUTING_API_KEY:-}
-      # DIFY_EVALUATION_API_KEY: ${DIFY_EVALUATION_API_KEY:-}
 
-      DIFY_ROUTING_API_KEY: ${PHOEBE_DIFY_ROUTING_API_KEY:-}
-      DIFY_EVALUATION_API_KEY: ${PHOEBE_DIFY_EVALUATION_API_KEY:-}
+      DIFY_ROUTING_API_KEY: ${DIFY_ROUTING_API_KEY:-}
+      DIFY_EVALUATION_API_KEY: ${DIFY_EVALUATION_API_KEY:-}
 
       DIFY_TIMEOUT_SECONDS: ${DIFY_TIMEOUT_SECONDS:-60}
       DIFY_RESPONSE_MODE: ${DIFY_RESPONSE_MODE:-blocking}
-      DIFY_USER: ${DIFY_USER:-aegis-poc}
+      DIFY_USER: ${DIFY_USER:-aegis}
       MAX_EVALUATION_CANDIDATES: ${MAX_EVALUATION_CANDIDATES:-2}
       MAX_PARALLEL_TICKETS: ${MAX_PARALLEL_TICKETS:-5}
       MAX_DIFY_RPM: ${MAX_DIFY_RPM:-60}
@@ -50,7 +46,7 @@ services:
 
   frontend:
     build:
-      context: ./poc/FrontEnd
+      context: ./aegis/FrontEnd
       dockerfile: Dockerfile
     container_name: aegis-frontend
     restart: unless-stopped

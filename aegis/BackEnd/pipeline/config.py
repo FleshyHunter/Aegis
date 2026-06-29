@@ -9,7 +9,7 @@ from dataclasses import dataclass
 DEFAULT_DIFY_BASE_URL = "https://api.dify.ai/v1"
 DEFAULT_DIFY_TIMEOUT_SECONDS = 60
 DEFAULT_DIFY_RESPONSE_MODE = "blocking"
-DEFAULT_DIFY_USER = "aegis-poc"
+DEFAULT_DIFY_USER = "aegis"
 
 
 class PipelineConfigError(RuntimeError):
