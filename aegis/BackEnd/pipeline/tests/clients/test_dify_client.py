@@ -3,12 +3,12 @@ import unittest
 import urllib.error
 from unittest.mock import patch
 
-from pipeline.clients.dify_client import (
+from pipeline.ai.clients.dify_client import (
     DifyClient,
     DifyClientError,
-    MockDifyClient,
     extract_outputs,
 )
+from pipeline.ai.clients.mock_dify_client import MockDifyClient
 from pipeline.config import DifyConfig, PipelineConfigError
 
 

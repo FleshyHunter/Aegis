@@ -18,7 +18,8 @@ BACKEND_DIR = Path(__file__).resolve().parents[1]
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
-from pipeline.clients.dify_client import DifyClient, MockDifyClient
+from pipeline.ai.clients.dify_client import DifyClient
+from pipeline.ai.clients.mock_dify_client import MockDifyClient
 from pipeline.config import DifyConfig
 from pipeline.evaluators.guards.currency_checker import guard_currency_evaluation
 from pipeline.evaluators.guards.frame_checker import guard_frame_evaluation
